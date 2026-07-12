@@ -1,8 +1,17 @@
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const { Pool } = require('pg');
 
 const DB_FILE = path.join(__dirname, 'db.json');
+
+let realPool = null;
+if (process.env.USE_POSTGRES === 'true') {
+  realPool = new Pool({
+    connectionString: process.env.DATABASE_URL
+  });
+  console.log('Real PostgreSQL Connection Pool Initialized.');
+}
 
 // Helper to read database
 function readDB() {
@@ -67,6 +76,10 @@ function writeDB(data) {
 }
 
 const query = async (text, params = []) => {
+  if (process.env.USE_POSTGRES === 'true' && realPool) {
+    return realPool.query(text, params);
+  }
+
   // Normalize whitespace
   const sql = text.replace(/\s+/g, ' ').trim();
   const data = readDB();
@@ -698,8 +711,13 @@ const query = async (text, params = []) => {
 
 module.exports = {
   query,
-  pool: {
-    query,
-    end: async () => {}
-  }
+  pool: process.env.USE_POSTGRES === 'true'
+    ? {
+        query: (text, params) => realPool.query(text, params),
+        end: () => realPool.end()
+      }
+    : {
+        query,
+        end: async () => {}
+      }
 };

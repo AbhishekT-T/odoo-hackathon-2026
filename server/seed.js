@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { pool } = require('./db');
 const fs = require('fs');
 const path = require('path');
@@ -7,13 +8,14 @@ async function seed() {
   console.log('Starting database seeding...');
 
   try {
+    // Drop existing tables to ensure schema updates apply
+    console.log('Dropping existing tables...');
+    await pool.query('DROP TABLE IF EXISTS users, fuel_logs, maintenances, trips, drivers, vehicles CASCADE;');
+
     // Read and run schema.sql to ensure tables exist
     const schemaSql = fs.readFileSync(path.join(__dirname, '../database/schema.sql'), 'utf8');
     await pool.query(schemaSql);
     console.log('Database tables verified/created.');
-
-    // Clear existing data to allow fresh seeds including users
-    await pool.query('TRUNCATE TABLE users, fuel_logs, maintenances, trips, drivers, vehicles RESTART IDENTITY CASCADE;');
 
     // Seed Admin User
     const passwordHash = bcrypt.hashSync('password123', 10);

@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+// Force nodemon reload to pick up env vars
 require('dotenv').config();
 
 const vehicleRoutes = require('./routes/vehicleRoutes');

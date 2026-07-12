@@ -53,7 +53,7 @@ async function runTests() {
     email: 'admin@transitops.com',
     password: 'password123'
   });
-  console.log('Login Response Status:', loginRes.status, 'User Role:', loginRes.body.user?.role);
+  console.log('Login Response:', loginRes.status, loginRes.body);
   token = loginRes.body.token;
 
   // Step 1: Register a vehicle 'Van-05' (max capacity: 500 kg)
