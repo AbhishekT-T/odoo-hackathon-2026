@@ -10,6 +10,7 @@ const fuelLogRoutes = require('./routes/fuelLogRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const reportsRoutes = require('./routes/reportsRoutes');
 const documentRoutes = require('./routes/documentRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,6 +25,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Register routes
+app.use('/api/auth', authRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/drivers', driverRoutes);
 app.use('/api/trips', tripRoutes);

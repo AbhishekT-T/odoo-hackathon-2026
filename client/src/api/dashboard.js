@@ -1,3 +1,3 @@
 import apiClient from './client';
 
-export const getDashboardKPIs = () => apiClient.get('/dashboard/kpis').then(res => res.data);
+export const getDashboardKPIs = (params) => apiClient.get('/dashboard/kpis', { params }).then(res => res.data);

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcryptjs');
 
 const DB_FILE = path.join(__dirname, 'db.json');
 
@@ -8,10 +9,13 @@ function readDB() {
   if (!fs.existsSync(DB_FILE)) {
     // Initial Seed Data if file doesn't exist
     const initialData = {
+      users: [
+        { id: 1, email: 'admin@transitops.com', password_hash: bcrypt.hashSync('password123', 10), name: 'Admin User', role: 'Fleet Manager' }
+      ],
       vehicles: [
-        { id: 1, registration_number: 'TX-707-VN', name: 'Van-05', type: 'Delivery Van', max_load_capacity: 500.0, odometer: 1000.0, acquisition_cost: 25000.0, status: 'Available' },
-        { id: 2, registration_number: 'TX-909-OP', name: 'Ford Transit Heavy Truck', type: 'Heavy Duty Truck', max_load_capacity: 15000.0, odometer: 45200.0, acquisition_cost: 85000.0, status: 'Available' },
-        { id: 3, registration_number: 'TX-404-SH', name: 'Mercedes Sprinter Cargo', type: 'Delivery Van', max_load_capacity: 3500.0, odometer: 12000.0, acquisition_cost: 35000.0, status: 'In Shop' }
+        { id: 1, registration_number: 'TX-707-VN', name: 'Van-05', type: 'Van', max_load_capacity: 500.0, odometer: 1000.0, acquisition_cost: 25000.0, status: 'Available', region: 'North' },
+        { id: 2, registration_number: 'TX-909-OP', name: 'Ford Transit Heavy Truck', type: 'Truck', max_load_capacity: 15000.0, odometer: 45200.0, acquisition_cost: 85000.0, status: 'Available', region: 'East' },
+        { id: 3, registration_number: 'TX-404-SH', name: 'Mercedes Sprinter Cargo', type: 'Van', max_load_capacity: 3500.0, odometer: 12000.0, acquisition_cost: 35000.0, status: 'In Shop', region: 'West' }
       ],
       drivers: [
         { id: 1, name: 'Alex', license_number: 'DL-99999X', license_category: 'Class B CDL', license_expiry_date: new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0], contact_number: '+1 555-0177', safety_score: 95.0, status: 'Available' },
@@ -31,12 +35,20 @@ function readDB() {
         { id: 1, entity_type: 'vehicle', entity_id: 1, document_type: 'Registration Certificate (RC)', file_name: 'rc_van_05.pdf', file_url: '#', expiry_date: '2030-12-31', status: 'Active' },
         { id: 2, entity_type: 'driver', entity_id: 1, document_type: 'Driving License', file_name: 'license_alex.pdf', file_url: '#', expiry_date: '2027-06-30', status: 'Active' }
       ],
-      nextIds: { vehicles: 4, drivers: 4, trips: 2, maintenances: 2, fuel_logs: 2, documents: 3 }
+      nextIds: { users: 2, vehicles: 4, drivers: 4, trips: 2, maintenances: 2, fuel_logs: 2, documents: 3 }
     };
     fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2));
     return initialData;
   }
   const dbData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+  if (!dbData.users) {
+    dbData.users = [
+      { id: 1, email: 'admin@transitops.com', password_hash: bcrypt.hashSync('password123', 10), name: 'Admin User', role: 'Fleet Manager' }
+    ];
+    if (!dbData.nextIds) dbData.nextIds = {};
+    dbData.nextIds.users = 2;
+    fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2));
+  }
   if (!dbData.documents) {
     dbData.documents = [
       { id: 1, entity_type: 'vehicle', entity_id: 1, document_type: 'Registration Certificate (RC)', file_name: 'rc_van_05.pdf', file_url: '#', expiry_date: '2030-12-31', status: 'Active' },
@@ -99,7 +111,7 @@ const query = async (text, params = []) => {
 
   // Raw trips seed insert
   if (sql.includes('INSERT INTO trips') && params.length && sql.includes('Chicago Depot')) {
-    const id = data.nextIds.trips++;
+    const id = 1;
     const newTrip = {
       id,
       source: 'Chicago Depot',
@@ -118,7 +130,7 @@ const query = async (text, params = []) => {
 
   // Raw maintenances seed insert
   if (sql.includes('INSERT INTO maintenances') && params.length && sql.includes('Brake pad replacement')) {
-    const id = data.nextIds.maintenances++;
+    const id = 1;
     const newMaint = {
       id,
       vehicle_id: Number(params[0]),
@@ -134,7 +146,7 @@ const query = async (text, params = []) => {
 
   // Raw fuel logs seed insert
   if (sql.includes('INSERT INTO fuel_logs') && params.length && sql.includes('320.0')) {
-    const id = data.nextIds.fuel_logs++;
+    const id = 1;
     const newFuel = {
       id,
       vehicle_id: Number(params[0]),
@@ -162,10 +174,27 @@ const query = async (text, params = []) => {
     return { rows };
   }
 
+  // Users Queries
+  if (sql.startsWith('SELECT * FROM users WHERE email = $1')) {
+    const email = params[0];
+    const rows = (data.users || []).filter(u => u.email === email);
+    return { rows };
+  }
+
+  if (sql.startsWith('INSERT INTO users')) {
+    const id = data.nextIds.users++;
+    const [email, password_hash, name, role] = params;
+    const newUser = { id, email, password_hash, name, role };
+    if (!data.users) data.users = [];
+    data.users.push(newUser);
+    writeDB(data);
+    return { rows: [newUser] };
+  }
+
   // 3. INSERT INTO vehicles
   if (sql.startsWith('INSERT INTO vehicles')) {
     const id = data.nextIds.vehicles++;
-    const [registration_number, name, type, max_load_capacity, odometer, acquisition_cost, status] = params;
+    const [registration_number, name, type, max_load_capacity, odometer, acquisition_cost, status, region] = params;
     const newVehicle = {
       id,
       registration_number,
@@ -174,7 +203,8 @@ const query = async (text, params = []) => {
       max_load_capacity: Number(max_load_capacity),
       odometer: Number(odometer || 0),
       acquisition_cost: Number(acquisition_cost || 0),
-      status: status || 'Available'
+      status: status || 'Available',
+      region: region || 'National'
     };
     data.vehicles.push(newVehicle);
     writeDB(data);
@@ -194,7 +224,7 @@ const query = async (text, params = []) => {
 
   // 5. UPDATE vehicles (general)
   if (sql.startsWith('UPDATE vehicles SET registration_number = $1')) {
-    const [registration_number, name, type, max_load_capacity, odometer, acquisition_cost, status, id] = params;
+    const [registration_number, name, type, max_load_capacity, odometer, acquisition_cost, status, region, id] = params;
     const vehicle = data.vehicles.find(v => v.id === Number(id));
     if (vehicle) {
       vehicle.registration_number = registration_number;
@@ -204,6 +234,7 @@ const query = async (text, params = []) => {
       vehicle.odometer = Number(odometer);
       vehicle.acquisition_cost = Number(acquisition_cost);
       vehicle.status = status;
+      vehicle.region = region;
       writeDB(data);
     }
     return { rows: vehicle ? [vehicle] : [] };
@@ -519,33 +550,76 @@ const query = async (text, params = []) => {
     return { rows: [] };
   }
 
-  // 25. Counts for Dashboard
-  if (sql.startsWith("SELECT COUNT(*) FROM vehicles WHERE status = 'On Trip'")) {
-    const count = data.vehicles.filter(v => v.status === 'On Trip').length;
-    return { rows: [{ count }] };
+  // 25. Counts for Dashboard (supporting dynamic SQL filtering)
+  if (sql.startsWith("SELECT COUNT(*) FROM vehicles v") || sql.startsWith("SELECT COUNT(*) FROM vehicles")) {
+    let vehicles = data.vehicles;
+    
+    if (sql.includes("status = 'On Trip'") || sql.includes("v.status = 'On Trip'")) {
+      vehicles = vehicles.filter(v => v.status === 'On Trip');
+    } else if (sql.includes("status = 'Available'") || sql.includes("v.status = 'Available'")) {
+      vehicles = vehicles.filter(v => v.status === 'Available');
+    } else if (sql.includes("status = 'In Shop'") || sql.includes("v.status = 'In Shop'")) {
+      vehicles = vehicles.filter(v => v.status === 'In Shop');
+    } else if (sql.includes("status != 'Retired'") || sql.includes("v.status != 'Retired'")) {
+      vehicles = vehicles.filter(v => v.status !== 'Retired');
+    }
+
+    const getParamValue = (field) => {
+      const match = sql.match(new RegExp(`v\\.${field} = \\$(\\d+)`));
+      if (match) {
+        const idx = parseInt(match[1]) - 1;
+        return params[idx];
+      }
+      return null;
+    };
+
+    const filterType = getParamValue('type');
+    const filterStatus = getParamValue('status');
+    const filterRegion = getParamValue('region');
+
+    if (filterType) vehicles = vehicles.filter(v => v.type === filterType);
+    if (filterStatus) vehicles = vehicles.filter(v => v.status === filterStatus);
+    if (filterRegion) vehicles = vehicles.filter(v => v.region === filterRegion);
+
+    return { rows: [{ count: vehicles.length }] };
   }
-  if (sql.startsWith("SELECT COUNT(*) FROM vehicles WHERE status = 'Available'")) {
-    const count = data.vehicles.filter(v => v.status === 'Available').length;
-    return { rows: [{ count }] };
+
+  if (sql.startsWith("SELECT COUNT(*) FROM trips t")) {
+    let trips = data.trips;
+    
+    if (sql.includes("t.status = 'Dispatched'")) {
+      trips = trips.filter(t => t.status === 'Dispatched');
+    } else if (sql.includes("t.status = 'Draft'")) {
+      trips = trips.filter(t => t.status === 'Draft');
+    }
+
+    const getParamValue = (field) => {
+      const match = sql.match(new RegExp(`v\\.${field} = \\$(\\d+)`));
+      if (match) {
+        const idx = parseInt(match[1]) - 1;
+        return params[idx];
+      }
+      return null;
+    };
+
+    const filterType = getParamValue('type');
+    const filterStatus = getParamValue('status');
+    const filterRegion = getParamValue('region');
+
+    trips = trips.filter(t => {
+      const v = data.vehicles.find(veh => veh.id === t.vehicle_id);
+      if (!v) return false;
+      if (filterType && v.type !== filterType) return false;
+      if (filterStatus && v.status !== filterStatus) return false;
+      if (filterRegion && v.region !== filterRegion) return false;
+      return true;
+    });
+
+    return { rows: [{ count: trips.length }] };
   }
-  if (sql.startsWith("SELECT COUNT(*) FROM vehicles WHERE status = 'In Shop'")) {
-    const count = data.vehicles.filter(v => v.status === 'In Shop').length;
-    return { rows: [{ count }] };
-  }
-  if (sql.startsWith("SELECT COUNT(*) FROM trips WHERE status = 'Dispatched'")) {
-    const count = data.trips.filter(t => t.status === 'Dispatched').length;
-    return { rows: [{ count }] };
-  }
-  if (sql.startsWith("SELECT COUNT(*) FROM trips WHERE status = 'Draft'")) {
-    const count = data.trips.filter(t => t.status === 'Draft').length;
-    return { rows: [{ count }] };
-  }
+
   if (sql.startsWith("SELECT COUNT(*) FROM drivers WHERE status = 'On Trip'")) {
     const count = data.drivers.filter(d => d.status === 'On Trip').length;
-    return { rows: [{ count }] };
-  }
-  if (sql.startsWith("SELECT COUNT(*) FROM vehicles WHERE status != 'Retired'")) {
-    const count = data.vehicles.filter(v => v.status !== 'Retired').length;
     return { rows: [{ count }] };
   }
 

@@ -15,8 +15,14 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Filter States
+  const [type, setType] = useState('');
+  const [status, setStatus] = useState('');
+  const [region, setRegion] = useState('');
+
   useEffect(() => {
-    getDashboardKPIs()
+    setLoading(true);
+    getDashboardKPIs({ type, status, region })
       .then(data => {
         setKpis(data);
         setLoading(false);
@@ -25,7 +31,7 @@ const Dashboard = () => {
         setError(err.message || 'Failed to load dashboard KPIs.');
         setLoading(false);
       });
-  }, []);
+  }, [type, status, region]);
 
   if (loading) return <div style={{ padding: '2rem' }}>Loading operations dashboard...</div>;
   if (error) return <div style={{ padding: '2rem', color: 'var(--status-retired)' }}>Error: {error}</div>;
@@ -36,6 +42,42 @@ const Dashboard = () => {
         <div>
           <h1 className="page-title">Operations Dashboard</h1>
           <p className="page-description">Real-time transport and fleet operational metrics</p>
+        </div>
+      </div>
+
+      {/* Filter Toolbar */}
+      <div className="card" style={{ marginBottom: '2rem', padding: '1.5rem' }}>
+        <h3 style={{ marginBottom: '1rem', fontSize: '1rem', fontWeight: 'bold' }}>Filter Operations</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+          <div className="form-group">
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.4rem', display: 'block' }}>Vehicle Type</label>
+            <select className="form-control" value={type} onChange={(e) => setType(e.target.value)} style={{ width: '100%' }}>
+              <option value="">All Types</option>
+              <option value="Van">Van</option>
+              <option value="Truck">Truck</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.4rem', display: 'block' }}>Vehicle Status</label>
+            <select className="form-control" value={status} onChange={(e) => setStatus(e.target.value)} style={{ width: '100%' }}>
+              <option value="">All Statuses</option>
+              <option value="Available">Available</option>
+              <option value="On Trip">On Trip</option>
+              <option value="In Shop">In Shop</option>
+              <option value="Retired">Retired</option>
+            </select>
+          </div>
+          <div className="form-group">
+            <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.4rem', display: 'block' }}>Region</label>
+            <select className="form-control" value={region} onChange={(e) => setRegion(e.target.value)} style={{ width: '100%' }}>
+              <option value="">All Regions</option>
+              <option value="North">North</option>
+              <option value="South">South</option>
+              <option value="East">East</option>
+              <option value="West">West</option>
+              <option value="National">National</option>
+            </select>
+          </div>
         </div>
       </div>
 

@@ -9,7 +9,25 @@ import Maintenance from './pages/Maintenance';
 import FuelExpense from './pages/FuelExpense';
 import Reports from './pages/Reports';
 
+import Login from './pages/Login';
+
 function App() {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    return (
+      <Router>
+        <div className="app-container" style={{ justifyContent: 'center' }}>
+          <main className="main-content" style={{ marginLeft: 0, padding: 0, width: '100%' }}>
+            <Routes>
+              <Route path="*" element={<Login />} />
+            </Routes>
+          </main>
+        </div>
+      </Router>
+    );
+  }
+
   return (
     <Router>
       <div className="app-container">
@@ -26,6 +44,7 @@ function App() {
             <Route path="/maintenance" element={<Maintenance />} />
             <Route path="/fuel-expenses" element={<FuelExpense />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="*" element={<Dashboard />} />
           </Routes>
         </main>
       </div>

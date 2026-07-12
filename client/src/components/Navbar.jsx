@@ -2,6 +2,13 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 
 const Navbar = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{"name": "Fleet Manager", "role": "Fleet Manager"}');
+
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = '/';
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
@@ -31,9 +38,16 @@ const Navbar = () => {
           <span>📈</span> Reports
         </NavLink>
       </nav>
-      <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-        <p>Logged in as:</p>
-        <strong style={{ color: 'var(--text-primary)' }}>Fleet Manager</strong>
+      <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', fontSize: '0.8rem' }}>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Logged in as:</p>
+        <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '0.8rem' }}>{user.name} ({user.role})</strong>
+        <button 
+          onClick={handleLogout} 
+          className="btn btn-secondary" 
+          style={{ width: '100%', padding: '0.4rem', fontSize: '0.8rem', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--status-retired)', border: 'none' }}
+        >
+          Logout
+        </button>
       </div>
     </aside>
   );

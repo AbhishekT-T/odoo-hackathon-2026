@@ -1,7 +1,14 @@
 const http = require('http');
+let token = null;
 
 function request(options, postData) {
   return new Promise((resolve, reject) => {
+    if (!options.headers) {
+      options.headers = {};
+    }
+    if (token) {
+      options.headers['Authorization'] = `Bearer ${token}`;
+    }
     const req = http.request(options, (res) => {
       let body = '';
       res.on('data', (chunk) => body += chunk);
@@ -31,6 +38,23 @@ async function runTests() {
 
   console.log('Resetting database...');
   execSync('node seed.js');
+  console.log('Waiting 2 seconds for server to reload...');
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  // Authenticate to get JWT token
+  console.log('\n[Auth] Logging in as admin...');
+  const loginRes = await request({
+    hostname: '127.0.0.1',
+    port: 5000,
+    path: '/api/auth/login',
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }, {
+    email: 'admin@transitops.com',
+    password: 'password123'
+  });
+  console.log('Login Response Status:', loginRes.status, 'User Role:', loginRes.body.user?.role);
+  token = loginRes.body.token;
 
   // Step 1: Register a vehicle 'Van-05' (max capacity: 500 kg)
   console.log('\n[Step 1] Registering vehicle "Van-05"...');

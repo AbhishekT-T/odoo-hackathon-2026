@@ -1,6 +1,7 @@
 const { pool } = require('./db');
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcryptjs');
 
 async function seed() {
   console.log('Starting database seeding...');
@@ -11,16 +12,24 @@ async function seed() {
     await pool.query(schemaSql);
     console.log('Database tables verified/created.');
 
-    // Clear existing data to allow fresh seeds
-    await pool.query('TRUNCATE TABLE fuel_logs, maintenances, trips, drivers, vehicles RESTART IDENTITY CASCADE;');
+    // Clear existing data to allow fresh seeds including users
+    await pool.query('TRUNCATE TABLE users, fuel_logs, maintenances, trips, drivers, vehicles RESTART IDENTITY CASCADE;');
 
-    // Insert Vehicles
+    // Seed Admin User
+    const passwordHash = bcrypt.hashSync('password123', 10);
+    await pool.query(`
+      INSERT INTO users (email, password_hash, name, role)
+      VALUES ($1, $2, $3, $4);
+    `, ['admin@transitops.com', passwordHash, 'Admin User', 'Fleet Manager']);
+    console.log('Seeded admin user.');
+
+    // Insert Vehicles with Type and Region
     const vehiclesResult = await pool.query(`
-      INSERT INTO vehicles (registration_number, name, type, max_load_capacity, odometer, acquisition_cost, status)
+      INSERT INTO vehicles (registration_number, name, type, max_load_capacity, odometer, acquisition_cost, status, region)
       VALUES 
-        ('TX-707-VN', 'Van-05', 'Delivery Van', 500, 1000.0, 25000.0, 'Available'),
-        ('TX-909-OP', 'Ford Transit Heavy Truck', 'Heavy Duty Truck', 15000, 45200.0, 85000.0, 'Available'),
-        ('TX-404-SH', 'Mercedes Sprinter Cargo', 'Delivery Van', 3500, 12000.0, 35000.0, 'In Shop')
+        ('TX-707-VN', 'Van-05', 'Van', 500, 1000.0, 25000.0, 'Available', 'North'),
+        ('TX-909-OP', 'Ford Transit Heavy Truck', 'Truck', 15000, 45200.0, 85000.0, 'Available', 'East'),
+        ('TX-404-SH', 'Mercedes Sprinter Cargo', 'Van', 3500, 12000.0, 35000.0, 'In Shop', 'West')
       RETURNING id, name;
     `);
     console.log('Seeded vehicles.');

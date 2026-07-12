@@ -1,4 +1,20 @@
 {
+  "users": [
+    {
+      "id": 1,
+      "email": "admin@transitops.com",
+      "password_hash": "$2b$10$EfbjMA.siFltXjI.j7lIm.URvCv0pxofYDxmxM3k2wjSzKpluafk2",
+      "name": "Admin User",
+      "role": "Fleet Manager"
+    },
+    {
+      "id": 2,
+      "email": "admin@transitops.com",
+      "password_hash": "$2b$10$ih1MsjlHEgigvltm67.NjOHQoKjilFRgtzGbn0NZ8oU261hSrWAHG",
+      "name": "Admin User",
+      "role": "Fleet Manager"
+    }
+  ],
   "vehicles": [
     {
       "id": 1,
@@ -29,6 +45,17 @@
       "odometer": 12000,
       "acquisition_cost": 35000,
       "status": "In Shop"
+    },
+    {
+      "id": 4,
+      "registration_number": "Van-05",
+      "name": "Delivery Van 05",
+      "type": "Van",
+      "max_load_capacity": 500,
+      "odometer": 1120,
+      "acquisition_cost": 25000,
+      "status": "Available",
+      "region": "National"
     }
   ],
   "drivers": [
@@ -64,18 +91,18 @@
     },
     {
       "id": 4,
-      "name": "r5y",
-      "license_number": "grdgdr",
+      "name": "Alex",
+      "license_number": "DL-99999",
       "license_category": "Class A CDL",
-      "license_expiry_date": "2026-07-21",
-      "contact_number": "w4g54g",
-      "safety_score": 100,
+      "license_expiry_date": "2028-07-12",
+      "contact_number": "555-0199",
+      "safety_score": 95,
       "status": "Available"
     }
   ],
   "trips": [
     {
-      "id": 2,
+      "id": 1,
       "source": "Chicago Depot",
       "destination": "New York Hub",
       "vehicle_id": 2,
@@ -83,24 +110,49 @@
       "cargo_weight": 12500,
       "planned_distance": 1270,
       "status": "Draft"
+    },
+    {
+      "id": 2,
+      "source": "Warehouse A",
+      "destination": "Retail Center B",
+      "vehicle_id": 4,
+      "driver_id": 4,
+      "cargo_weight": 450,
+      "planned_distance": 120,
+      "status": "Completed"
     }
   ],
   "maintenances": [
     {
-      "id": 2,
+      "id": 1,
       "vehicle_id": 3,
       "description": "Brake pad replacement and engine check.",
       "cost": 450,
       "status": "Active"
+    },
+    {
+      "id": 2,
+      "vehicle_id": 4,
+      "description": "Oil Change and General Service",
+      "cost": 150,
+      "status": "Closed"
     }
   ],
   "fuel_logs": [
     {
-      "id": 2,
+      "id": 1,
       "vehicle_id": 2,
       "liters": 320,
       "cost": 640,
       "date": "2026-07-12",
+      "expense_type": "Fuel"
+    },
+    {
+      "id": 2,
+      "vehicle_id": 4,
+      "liters": 15,
+      "cost": 22.5,
+      "date": "2026-07-12T05:26:17.327Z",
       "expense_type": "Fuel"
     }
   ],
@@ -124,24 +176,15 @@
       "file_url": "#",
       "expiry_date": "2027-06-30",
       "status": "Active"
-    },
-    {
-      "id": 3,
-      "entity_type": "driver",
-      "entity_id": 3,
-      "document_type": "Aadhaar/PAN (ID Proof)",
-      "file_name": "defdv",
-      "file_url": "#",
-      "expiry_date": null,
-      "status": "Active"
     }
   ],
   "nextIds": {
-    "vehicles": 4,
+    "users": 3,
+    "vehicles": 5,
     "drivers": 5,
-    "trips": 2,
-    "maintenances": 2,
-    "fuel_logs": 2,
-    "documents": 4
+    "trips": 3,
+    "maintenances": 3,
+    "fuel_logs": 3,
+    "documents": 3
   }
 }
