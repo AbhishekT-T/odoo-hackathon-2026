@@ -124,6 +124,16 @@
       "file_url": "#",
       "expiry_date": "2027-06-30",
       "status": "Active"
+    },
+    {
+      "id": 3,
+      "entity_type": "driver",
+      "entity_id": 3,
+      "document_type": "Aadhaar/PAN (ID Proof)",
+      "file_name": "defdv",
+      "file_url": "#",
+      "expiry_date": null,
+      "status": "Active"
     }
   ],
   "nextIds": {
@@ -132,6 +142,6 @@
     "trips": 2,
     "maintenances": 2,
     "fuel_logs": 2,
-    "documents": 3
+    "documents": 4
   }
 }
