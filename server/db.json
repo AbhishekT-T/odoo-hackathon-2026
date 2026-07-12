@@ -1,0 +1,122 @@
+{
+  "vehicles": [
+    {
+      "id": 1,
+      "registration_number": "TX-707-VN",
+      "name": "Van-05",
+      "type": "Delivery Van",
+      "max_load_capacity": 500,
+      "odometer": 1000,
+      "acquisition_cost": 25000,
+      "status": "Available"
+    },
+    {
+      "id": 2,
+      "registration_number": "TX-909-OP",
+      "name": "Ford Transit Heavy Truck",
+      "type": "Electric Cargo",
+      "max_load_capacity": 15045,
+      "odometer": 45219,
+      "acquisition_cost": 85060,
+      "status": "In Shop"
+    },
+    {
+      "id": 3,
+      "registration_number": "TX-404-SH",
+      "name": "Mercedes Sprinter Cargo",
+      "type": "Heavy Duty Truck",
+      "max_load_capacity": 3500,
+      "odometer": 12000,
+      "acquisition_cost": 35000,
+      "status": "Available"
+    },
+    {
+      "id": 5,
+      "registration_number": "esgfesf",
+      "name": "esfsgfesg",
+      "type": "Delivery Van",
+      "max_load_capacity": 7777,
+      "odometer": 7777,
+      "acquisition_cost": 7777,
+      "status": "Available"
+    }
+  ],
+  "drivers": [
+    {
+      "id": 1,
+      "name": "Alex",
+      "license_number": "DL-99999X",
+      "license_category": "Class B CDL",
+      "license_expiry_date": "2027-07-12",
+      "contact_number": "+1 555-0177",
+      "safety_score": 95,
+      "status": "Available"
+    },
+    {
+      "id": 2,
+      "name": "Alice Smith",
+      "license_number": "DL-88271A",
+      "license_category": "Class A CDL",
+      "license_expiry_date": "2028-07-11",
+      "contact_number": "+1 555-0199",
+      "safety_score": 98.5,
+      "status": "Available"
+    },
+    {
+      "id": 3,
+      "name": "Bob Miller",
+      "license_number": "DL-11029B",
+      "license_category": "Class B CDL",
+      "license_expiry_date": "2027-01-08",
+      "contact_number": "+1 555-0144",
+      "safety_score": 72,
+      "status": "Available"
+    }
+  ],
+  "trips": [
+    {
+      "id": 2,
+      "source": "Chicago Depot",
+      "destination": "New York Hub",
+      "vehicle_id": 2,
+      "driver_id": 2,
+      "cargo_weight": 12500,
+      "planned_distance": 1270,
+      "status": "Dispatched"
+    }
+  ],
+  "maintenances": [
+    {
+      "id": 2,
+      "vehicle_id": 3,
+      "description": "Brake pad replacement and engine check.",
+      "cost": 450,
+      "status": "Closed"
+    }
+  ],
+  "fuel_logs": [
+    {
+      "id": 2,
+      "vehicle_id": 2,
+      "liters": 320,
+      "cost": 640,
+      "date": "2026-07-12",
+      "expense_type": "Fuel"
+    },
+    {
+      "id": 2,
+      "vehicle_id": 5,
+      "liters": 566,
+      "cost": 56656,
+      "date": "2026-07-12",
+      "expense_type": "Fuel"
+    }
+  ],
+  "nextIds": {
+    "vehicles": 6,
+    "drivers": 4,
+    "trips": 2,
+    "maintenances": 2,
+    "fuel_logs": 3
+  }
+}
