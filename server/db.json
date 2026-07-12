@@ -28,7 +28,7 @@
       "max_load_capacity": 3500,
       "odometer": 12000,
       "acquisition_cost": 35000,
-      "status": "In Shop"
+      "status": "Available"
     }
   ],
   "drivers": [
@@ -82,18 +82,10 @@
       "driver_id": 2,
       "cargo_weight": 12500,
       "planned_distance": 1270,
-      "status": "Draft"
+      "status": "Dispatched"
     }
   ],
-  "maintenances": [
-    {
-      "id": 2,
-      "vehicle_id": 3,
-      "description": "Brake pad replacement and engine check.",
-      "cost": 450,
-      "status": "Active"
-    }
-  ],
+  "maintenances": [],
   "fuel_logs": [
     {
       "id": 2,
@@ -137,11 +129,11 @@
     }
   ],
   "nextIds": {
-    "vehicles": 4,
+    "vehicles": 6,
     "drivers": 5,
     "trips": 2,
-    "maintenances": 2,
+    "maintenances": 3,
     "fuel_logs": 2,
-    "documents": 4
+    "documents": 5
   }
 }

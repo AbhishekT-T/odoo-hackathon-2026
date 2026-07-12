@@ -114,6 +114,54 @@ const TripManagement = () => {
     }
   };
 
+  const renderTripProgress = (status) => {
+    if (status === 'Cancelled') {
+      return (
+        <div className="stepper-progress cancelled">
+          <div className="step active draft">
+            <div className="step-dot"></div>
+            <span className="step-label">Draft</span>
+          </div>
+          <div className="step-line active-cancelled"></div>
+          <div className="step active cancelled">
+            <div className="step-dot"></div>
+            <span className="step-label">Cancelled</span>
+          </div>
+        </div>
+      );
+    }
+
+    const getStepClass = (stepName) => {
+      const statusOrder = { 'Draft': 0, 'Dispatched': 1, 'Completed': 2 };
+      const currentOrder = statusOrder[status] !== undefined ? statusOrder[status] : -1;
+      const stepOrder = statusOrder[stepName];
+      
+      if (stepOrder <= currentOrder) {
+        return `step active ${stepName.toLowerCase()}`;
+      }
+      return 'step inactive';
+    };
+
+    return (
+      <div className="stepper-progress">
+        <div className={getStepClass('Draft')}>
+          <div className="step-dot"></div>
+          <span className="step-label">Draft</span>
+        </div>
+        <div className={`step-line ${status === 'Dispatched' || status === 'Completed' ? 'active-dispatched' : ''}`}></div>
+        <div className={getStepClass('Dispatched')}>
+          <div className="step-dot"></div>
+          <span className="step-label">Dispatched</span>
+        </div>
+        <div className={`step-line ${status === 'Completed' ? 'active-completed' : ''}`}></div>
+        <div className={getStepClass('Completed')}>
+          <div className="step-dot"></div>
+          <span className="step-label">Completed</span>
+        </div>
+      </div>
+    );
+  };
+
   // Only allow Available vehicles / drivers in dispatch pool
   const availableVehicles = vehicles.filter(v => v.status === 'Available');
   const availableDrivers = drivers.filter(d => d.status === 'Available');
@@ -154,9 +202,12 @@ const TripManagement = () => {
                 <td>{t.cargo_weight} kg</td>
                 <td>{t.planned_distance} km</td>
                 <td>
-                  <span className={`badge badge-${t.status.toLowerCase()}`}>
-                    {t.status}
-                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    <span className={`badge badge-${t.status.toLowerCase()}`} style={{ width: 'fit-content' }}>
+                      {t.status}
+                    </span>
+                    {renderTripProgress(t.status)}
+                  </div>
                 </td>
                 <td>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>

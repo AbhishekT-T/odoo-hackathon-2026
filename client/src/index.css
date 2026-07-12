@@ -355,7 +355,127 @@ tr:hover td {
 
 .modal-footer {
   display: flex;
-  justify-content: flex-end;
+  justify: flex-end;
   gap: 1rem;
   margin-top: 1.5rem;
+}
+
+/* Progress Stepper Styles */
+.stepper-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 220px;
+  background: rgba(15, 23, 42, 0.4);
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border-color);
+}
+
+.stepper-progress.cancelled {
+  border-color: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.03);
+}
+
+.stepper-progress.maint {
+  min-width: 140px;
+}
+
+.stepper-progress .step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  gap: 0.15rem;
+  flex: 1;
+}
+
+.stepper-progress .step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--bg-input);
+  border: 2px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.stepper-progress .step.active .step-dot {
+  background-color: var(--accent-color);
+  border-color: var(--text-primary);
+  box-shadow: 0 0 6px var(--accent-color);
+}
+
+/* Unique step dot colors */
+.stepper-progress .step.active.draft .step-dot {
+  background-color: var(--status-available);
+  border-color: var(--text-primary);
+  box-shadow: 0 0 6px var(--status-available);
+}
+.stepper-progress .step.active.draft {
+  color: var(--status-available);
+}
+
+.stepper-progress .step.active.dispatched .step-dot {
+  background-color: var(--status-ontrip);
+  border-color: var(--text-primary);
+  box-shadow: 0 0 6px var(--status-ontrip);
+}
+.stepper-progress .step.active.dispatched {
+  color: var(--status-ontrip);
+}
+
+.stepper-progress .step.active.completed .step-dot {
+  background-color: var(--status-available);
+  border-color: var(--text-primary);
+  box-shadow: 0 0 6px var(--status-available);
+}
+.stepper-progress .step.active.completed {
+  color: var(--status-available);
+}
+
+.stepper-progress .step.active.cancelled .step-dot {
+  background-color: var(--status-retired);
+  border-color: var(--text-primary);
+  box-shadow: 0 0 6px var(--status-retired);
+}
+.stepper-progress .step.active.cancelled {
+  color: var(--status-retired);
+}
+
+/* Maintenance step dot colors */
+.stepper-progress .step.active.active .step-dot {
+  background-color: var(--status-inshop);
+  border-color: var(--text-primary);
+  box-shadow: 0 0 6px var(--status-inshop);
+}
+.stepper-progress .step.active.active {
+  color: var(--status-inshop);
+}
+
+.stepper-progress .step-line {
+  flex: 1;
+  height: 2px;
+  background-color: var(--border-color);
+  border-radius: 1px;
+  transition: all 0.3s ease;
+}
+
+.stepper-progress .step-line.active-dispatched {
+  background-color: var(--status-ontrip);
+}
+
+.stepper-progress .step-line.active-completed {
+  background-color: var(--status-available);
+}
+
+.stepper-progress .step-line.active-cancelled {
+  background-color: var(--status-retired);
+}
+
+.stepper-progress .step-label {
+  white-space: nowrap;
+  font-size: 0.6rem;
+  letter-spacing: 0.01em;
 }
