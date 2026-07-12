@@ -15,6 +15,11 @@ const Vehicle = {
     return result.rows[0];
   },
 
+  getByRegistrationNumber: async (registration_number) => {
+    const result = await db.query('SELECT * FROM vehicles WHERE registration_number = $1', [registration_number]);
+    return result.rows[0];
+  },
+
   create: async (data) => {
     const { registration_number, name, type, max_load_capacity, odometer, acquisition_cost, status } = data;
     const result = await db.query(

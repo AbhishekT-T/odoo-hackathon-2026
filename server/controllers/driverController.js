@@ -30,7 +30,10 @@ exports.getDriverById = async (req, res) => {
  */
 exports.createDriver = async (req, res) => {
   try {
-    // TODO: Verify license number is unique before creating
+    const existing = await Driver.getByLicenseNumber(req.body.license_number);
+    if (existing) {
+      return res.status(400).json({ error: 'Driver license number must be unique.' });
+    }
     const newDriver = await Driver.create(req.body);
     res.status(201).json(newDriver);
   } catch (err) {
@@ -43,6 +46,12 @@ exports.createDriver = async (req, res) => {
  */
 exports.updateDriver = async (req, res) => {
   try {
+    if (req.body.license_number) {
+      const existing = await Driver.getByLicenseNumber(req.body.license_number);
+      if (existing && existing.id !== parseInt(req.params.id)) {
+        return res.status(400).json({ error: 'Driver license number must be unique.' });
+      }
+    }
     const updatedDriver = await Driver.update(req.params.id, req.body);
     if (!updatedDriver) return res.status(404).json({ error: 'Driver not found.' });
     res.json(updatedDriver);

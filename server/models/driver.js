@@ -15,6 +15,11 @@ const Driver = {
     return result.rows[0];
   },
 
+  getByLicenseNumber: async (license_number) => {
+    const result = await db.query('SELECT * FROM drivers WHERE license_number = $1', [license_number]);
+    return result.rows[0];
+  },
+
   create: async (data) => {
     const { name, license_number, license_category, license_expiry_date, contact_number, safety_score, status } = data;
     const result = await db.query(
