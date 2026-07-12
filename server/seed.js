@@ -12,7 +12,7 @@ async function seed() {
     console.log('Database tables verified/created.');
 
     // Clear existing data to allow fresh seeds
-    await pool.query('TRUNCATE TABLE fuel_logs, maintenances, trips, drivers, vehicles RESTART IDENTITY CASCADE;');
+    await pool.query('TRUNCATE TABLE fuel_logs, maintenances, trips, drivers, vehicles, users RESTART IDENTITY CASCADE;');
 
     // Insert Vehicles
     const vehiclesResult = await pool.query(`

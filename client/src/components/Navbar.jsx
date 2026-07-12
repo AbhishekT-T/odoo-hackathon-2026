@@ -1,7 +1,16 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/signup');
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
@@ -33,7 +42,19 @@ const Navbar = () => {
       </nav>
       <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
         <p>Logged in as:</p>
-        <strong style={{ color: 'var(--text-primary)' }}>Fleet Manager</strong>
+        <strong style={{ color: 'var(--text-primary)' }}>{user?.full_name || user?.username || 'User'}</strong>
+        <button 
+          onClick={handleLogout}
+          className="btn btn-secondary"
+          style={{ 
+            width: '100%', 
+            marginTop: '0.75rem',
+            fontSize: '0.8rem',
+            padding: '0.5rem'
+          }}
+        >
+          🚪 Logout
+        </button>
       </div>
     </aside>
   );

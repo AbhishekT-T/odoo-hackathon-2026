@@ -3,7 +3,7 @@ require('dotenv').config();
 
 // Initialize the database connection pool
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://odoo:odoo@localhost:5432/transitops'
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:indus.hackthon@127.0.0.1:5432/hackdemo'
 });
 
 pool.on('connect', () => {
