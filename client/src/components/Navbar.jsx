@@ -1,12 +1,14 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
-  const user = JSON.parse(localStorage.getItem('user') || '{"name": "Fleet Manager", "role": "Fleet Manager"}');
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.clear();
-    window.location.href = '/';
+    logout();
+    navigate('/signup');
   };
 
   return (
@@ -38,15 +40,20 @@ const Navbar = () => {
           <span>📈</span> Reports
         </NavLink>
       </nav>
-      <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', fontSize: '0.8rem' }}>
-        <p style={{ color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Logged in as:</p>
-        <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '0.8rem' }}>{user.name} ({user.role})</strong>
+      <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+        <p>Logged in as:</p>
+        <strong style={{ color: 'var(--text-primary)' }}>{user?.full_name || user?.username || 'User'}</strong>
         <button 
-          onClick={handleLogout} 
-          className="btn btn-secondary" 
-          style={{ width: '100%', padding: '0.4rem', fontSize: '0.8rem', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--status-retired)', border: 'none' }}
+          onClick={handleLogout}
+          className="btn btn-secondary"
+          style={{ 
+            width: '100%', 
+            marginTop: '0.75rem',
+            fontSize: '0.8rem',
+            padding: '0.5rem'
+          }}
         >
-          Logout
+          🚪 Logout
         </button>
       </div>
     </aside>

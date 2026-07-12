@@ -10,7 +10,6 @@ const maintenanceRoutes = require('./routes/maintenanceRoutes');
 const fuelLogRoutes = require('./routes/fuelLogRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const reportsRoutes = require('./routes/reportsRoutes');
-const documentRoutes = require('./routes/documentRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 const app = express();
@@ -34,7 +33,7 @@ app.use('/api/maintenance', maintenanceRoutes);
 app.use('/api/fuel-logs', fuelLogRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/reports', reportsRoutes);
-app.use('/api/documents', documentRoutes);
+app.use('/api/auth', authRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

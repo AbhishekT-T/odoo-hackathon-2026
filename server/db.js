@@ -3,7 +3,10 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const { Pool } = require('pg');
 
-const DB_FILE = path.join(__dirname, 'db.json');
+// Initialize the database connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:indus.hackthon@127.0.0.1:5432/hackdemo'
+});
 
 let realPool = null;
 if (process.env.USE_POSTGRES === 'true') {
