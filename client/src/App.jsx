@@ -47,15 +47,17 @@ function App() {
 
   if (!token) {
     return (
-      <Router>
-        <div className="app-container" style={{ justifyContent: 'center' }}>
-          <main className="main-content" style={{ marginLeft: 0, padding: 0, width: '100%' }}>
-            <Routes>
-              <Route path="*" element={<Login />} />
-            </Routes>
-          </main>
-        </div>
-      </Router>
+      <AuthProvider>
+        <Router>
+          <div className="app-container" style={{ justifyContent: 'center' }}>
+            <main className="main-content" style={{ marginLeft: 0, padding: 0, width: '100%' }}>
+              <Routes>
+                <Route path="*" element={<Login />} />
+              </Routes>
+            </main>
+          </div>
+        </Router>
+      </AuthProvider>
     );
   }
 
