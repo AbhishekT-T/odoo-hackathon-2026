@@ -29,6 +29,21 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
+    // Auto-create driver profile on login if role is Driver and no profile exists
+    if (user.role === 'Driver') {
+      const driverRes = await pool.query('SELECT * FROM drivers ORDER BY id DESC');
+      const driverExists = driverRes.rows.some(d => d.name.toLowerCase() === user.name.toLowerCase());
+      if (!driverExists) {
+        const defLicense = 'LIC-' + Math.floor(100000 + Math.random() * 900000);
+        const defExpiry = new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0];
+        await pool.query(
+          `INSERT INTO drivers (name, license_number, license_category, license_expiry_date, contact_number, safety_score, status) 
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          [user.name, defLicense, 'Standard Driver License', defExpiry, 'N/A', 100.0, 'Available']
+        );
+      }
+    }
+
     // Sign JWT
     const token = jwt.sign(
       { id: user.id, email: user.email, name: user.name, role: user.role },
@@ -72,6 +87,17 @@ exports.register = async (req, res) => {
       'INSERT INTO users (email, password_hash, name, role) VALUES ($1, $2, $3, $4) RETURNING id, email, name, role',
       [email, passwordHash, name, role || 'Fleet Manager']
     );
+
+    // Auto-create driver profile on registration if role is Driver
+    if (role === 'Driver') {
+      const defLicense = 'LIC-' + Math.floor(100000 + Math.random() * 900000);
+      const defExpiry = new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0];
+      await pool.query(
+        `INSERT INTO drivers (name, license_number, license_category, license_expiry_date, contact_number, safety_score, status) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [name, defLicense, 'Standard Driver License', defExpiry, 'N/A', 100.0, 'Available']
+      );
+    }
 
     res.status(201).json({
       message: 'User registered successfully.',

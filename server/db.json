@@ -60,7 +60,7 @@
       "license_expiry_date": "2027-01-08",
       "contact_number": "+1 555-0144",
       "safety_score": 72,
-      "status": "Suspended"
+      "status": "Available"
     },
     {
       "id": 4,
@@ -82,7 +82,7 @@
       "driver_id": 2,
       "cargo_weight": 12500,
       "planned_distance": 1270,
-      "status": "Dispatched"
+      "status": "Completed"
     }
   ],
   "maintenances": [],
