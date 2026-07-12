@@ -197,10 +197,46 @@ const query = async (text, params = []) => {
     return { rows };
   }
 
+  if (sql.startsWith('SELECT * FROM users WHERE username = $1 OR email = $1') || sql.startsWith('SELECT * FROM users WHERE username = $1 OR email = $2')) {
+    const [val1, val2] = params;
+    const rows = (data.users || []).filter(u => u.username === val1 || u.email === (val2 || val1));
+    return { rows };
+  }
+
+  if (sql.includes('FROM users WHERE id = $1')) {
+    const id = params[0];
+    const rows = (data.users || []).filter(u => u.id === Number(id));
+    return { rows };
+  }
+
   if (sql.startsWith('INSERT INTO users')) {
     const id = data.nextIds.users++;
-    const [email, password_hash, name, role] = params;
-    const newUser = { id, email, password_hash, name, role };
+    let newUser;
+    if (params.length === 5) {
+      const [username, email, password_hash, full_name, role] = params;
+      newUser = { 
+        id, 
+        username, 
+        email, 
+        password_hash, 
+        full_name, 
+        name: full_name, 
+        role, 
+        created_at: new Date().toISOString() 
+      };
+    } else {
+      const [email, password_hash, name, role] = params;
+      newUser = { 
+        id, 
+        username: email.split('@')[0], 
+        email, 
+        password_hash, 
+        full_name: name, 
+        name, 
+        role, 
+        created_at: new Date().toISOString() 
+      };
+    }
     if (!data.users) data.users = [];
     data.users.push(newUser);
     writeDB(data);

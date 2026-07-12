@@ -36,6 +36,17 @@ const register = async (req, res) => {
 
     const user = result.rows[0];
 
+    // Auto-create driver profile on registration if role is Driver
+    if (user.role && user.role.toLowerCase() === 'driver') {
+      const defLicense = 'LIC-' + Math.floor(100000 + Math.random() * 900000);
+      const defExpiry = new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0];
+      await pool.query(
+        `INSERT INTO drivers (name, license_number, license_category, license_expiry_date, contact_number, safety_score, status) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [user.full_name, defLicense, 'Standard Driver License', defExpiry, 'N/A', 100.0, 'Available']
+      );
+    }
+
     res.status(201).json({
       message: 'User registered successfully',
       user: {
@@ -80,6 +91,21 @@ const login = async (req, res) => {
 
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Auto-create driver profile on login if role is Driver and no profile exists
+    if (user.role && user.role.toLowerCase() === 'driver') {
+      const driverRes = await pool.query('SELECT * FROM drivers ORDER BY id DESC');
+      const driverExists = driverRes.rows.some(d => d.name.toLowerCase() === user.full_name.toLowerCase());
+      if (!driverExists) {
+        const defLicense = 'LIC-' + Math.floor(100000 + Math.random() * 900000);
+        const defExpiry = new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0];
+        await pool.query(
+          `INSERT INTO drivers (name, license_number, license_category, license_expiry_date, contact_number, safety_score, status) 
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          [user.full_name, defLicense, 'Standard Driver License', defExpiry, 'N/A', 100.0, 'Available']
+        );
+      }
     }
 
     // Return user info (excluding password hash)
