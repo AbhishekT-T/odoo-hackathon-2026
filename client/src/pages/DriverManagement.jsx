@@ -79,7 +79,6 @@ const DriverManagement = () => {
   };
 
   const handleEditClick = (d) => {
-    // Format date to yyyy-MM-dd for HTML date input
     const expiryDate = d.license_expiry_date 
       ? new Date(d.license_expiry_date).toISOString().split('T')[0] 
       : '';
@@ -207,6 +206,60 @@ const DriverManagement = () => {
           alert(err.response?.data?.error || err.message || 'Error deleting document');
         });
     }
+  };
+
+  const handleDownloadDoc = (doc) => {
+    const fileContent = `TransitOps Document Export
+------------------------------------
+ID: ${doc.id}
+Entity Type: ${doc.entity_type.toUpperCase()}
+Entity ID: ${doc.entity_id}
+Document Type: ${doc.document_type}
+File Name: ${doc.file_name}
+Expiry Date: ${doc.expiry_date ? new Date(doc.expiry_date).toLocaleDateString() : 'N/A'}
+Status: ${doc.status}
+Generated: ${new Date().toLocaleString()}
+
+This is a certified digital export copy of the uploaded document from the TransitOps Fleet Management Platform.`;
+
+    const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const baseName = doc.file_name.substring(0, doc.file_name.lastIndexOf('.')) || doc.file_name;
+    link.setAttribute('download', `${baseName}_export.txt`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportDocsCSV = () => {
+    if (driverDocs.length === 0) {
+      alert('No documents to export.');
+      return;
+    }
+
+    const headers = ['Document ID', 'Document Type', 'File Name', 'Expiry Date', 'Status'];
+    const csvRows = [
+      headers.join(','),
+      ...driverDocs.map(doc => [
+        doc.id,
+        `"${doc.document_type.replace(/"/g, '""')}"`,
+        `"${doc.file_name.replace(/"/g, '""')}"`,
+        doc.expiry_date ? new Date(doc.expiry_date).toISOString().split('T')[0] : 'N/A',
+        doc.status
+      ].join(','))
+    ];
+
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${selectedDriver.name.replace(/\s+/g, '_')}_documents.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   if (loading) return <div style={{ padding: '2rem' }}>Loading driver profiles...</div>;
@@ -375,10 +428,17 @@ const DriverManagement = () => {
 
       {showDocModal && selectedDriver && (
         <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '650px' }}>
+          <div className="modal-content" style={{ maxWidth: '680px' }}>
             <div className="modal-header">
               <h2 className="modal-title">Documents for {selectedDriver.name}</h2>
-              <button className="modal-close" onClick={() => setShowDocModal(false)}>&times;</button>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                {driverDocs.length > 0 && (
+                  <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', borderColor: 'var(--accent-color)', color: 'var(--text-primary)' }} onClick={handleExportDocsCSV}>
+                    Export CSV 📊
+                  </button>
+                )}
+                <button className="modal-close" onClick={() => setShowDocModal(false)}>&times;</button>
+              </div>
             </div>
             
             <div style={{ marginBottom: '1.5rem', maxHeight: '220px', overflowY: 'auto' }}>
@@ -409,9 +469,14 @@ const DriverManagement = () => {
                           </span>
                         </td>
                         <td>
-                          <button className="btn btn-danger" style={{ padding: '0.1rem 0.4rem', fontSize: '0.7rem' }} onClick={() => handleDocDelete(doc.id)}>
-                            Delete
-                          </button>
+                          <div style={{ display: 'flex', gap: '0.3rem' }}>
+                            <button className="btn btn-secondary" style={{ padding: '0.1rem 0.4rem', fontSize: '0.7rem', borderColor: 'var(--accent-color)' }} onClick={() => handleDownloadDoc(doc)}>
+                              Download 📥
+                            </button>
+                            <button className="btn btn-danger" style={{ padding: '0.1rem 0.4rem', fontSize: '0.7rem' }} onClick={() => handleDocDelete(doc.id)}>
+                              Delete
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}

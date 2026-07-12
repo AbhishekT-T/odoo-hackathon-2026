@@ -14,31 +14,21 @@
       "id": 2,
       "registration_number": "TX-909-OP",
       "name": "Ford Transit Heavy Truck",
-      "type": "Electric Cargo",
-      "max_load_capacity": 15045,
-      "odometer": 45219,
-      "acquisition_cost": 85060,
-      "status": "In Shop"
+      "type": "Heavy Duty Truck",
+      "max_load_capacity": 15000,
+      "odometer": 45200,
+      "acquisition_cost": 85000,
+      "status": "Available"
     },
     {
       "id": 3,
       "registration_number": "TX-404-SH",
       "name": "Mercedes Sprinter Cargo",
-      "type": "Heavy Duty Truck",
+      "type": "Delivery Van",
       "max_load_capacity": 3500,
       "odometer": 12000,
       "acquisition_cost": 35000,
-      "status": "Available"
-    },
-    {
-      "id": 5,
-      "registration_number": "esgfesf",
-      "name": "esfsgfesg",
-      "type": "Delivery Van",
-      "max_load_capacity": 7777,
-      "odometer": 7777,
-      "acquisition_cost": 7777,
-      "status": "Available"
+      "status": "In Shop"
     }
   ],
   "drivers": [
@@ -70,6 +60,16 @@
       "license_expiry_date": "2027-01-08",
       "contact_number": "+1 555-0144",
       "safety_score": 72,
+      "status": "Suspended"
+    },
+    {
+      "id": 4,
+      "name": "r5y",
+      "license_number": "grdgdr",
+      "license_category": "Class A CDL",
+      "license_expiry_date": "2026-07-21",
+      "contact_number": "w4g54g",
+      "safety_score": 100,
       "status": "Available"
     }
   ],
@@ -82,7 +82,7 @@
       "driver_id": 2,
       "cargo_weight": 12500,
       "planned_distance": 1270,
-      "status": "Dispatched"
+      "status": "Draft"
     }
   ],
   "maintenances": [
@@ -91,7 +91,7 @@
       "vehicle_id": 3,
       "description": "Brake pad replacement and engine check.",
       "cost": 450,
-      "status": "Closed"
+      "status": "Active"
     }
   ],
   "fuel_logs": [
@@ -102,21 +102,36 @@
       "cost": 640,
       "date": "2026-07-12",
       "expense_type": "Fuel"
+    }
+  ],
+  "documents": [
+    {
+      "id": 1,
+      "entity_type": "vehicle",
+      "entity_id": 1,
+      "document_type": "Registration Certificate (RC)",
+      "file_name": "rc_van_05.pdf",
+      "file_url": "#",
+      "expiry_date": "2030-12-31",
+      "status": "Active"
     },
     {
       "id": 2,
-      "vehicle_id": 5,
-      "liters": 566,
-      "cost": 56656,
-      "date": "2026-07-12",
-      "expense_type": "Fuel"
+      "entity_type": "driver",
+      "entity_id": 1,
+      "document_type": "Driving License",
+      "file_name": "license_alex.pdf",
+      "file_url": "#",
+      "expiry_date": "2027-06-30",
+      "status": "Active"
     }
   ],
   "nextIds": {
-    "vehicles": 6,
-    "drivers": 4,
+    "vehicles": 4,
+    "drivers": 5,
     "trips": 2,
     "maintenances": 2,
-    "fuel_logs": 3
+    "fuel_logs": 2,
+    "documents": 3
   }
 }
