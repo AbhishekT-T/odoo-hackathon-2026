@@ -7,6 +7,7 @@ const { authenticateUser, requireRole } = require('../middleware/auth');
 router.use(authenticateUser);
 
 router.get('/', fuelLogController.getAllFuelLogs);
+router.get('/summary', fuelLogController.getFuelSummary);
 router.get('/:id', fuelLogController.getFuelLogById);
 router.post('/', requireRole(['Fleet Manager', 'Financial Analyst', 'Driver']), validateFuelLog, fuelLogController.createFuelLog);
 router.put('/:id', requireRole(['Fleet Manager', 'Financial Analyst']), validateFuelLog, fuelLogController.updateFuelLog);

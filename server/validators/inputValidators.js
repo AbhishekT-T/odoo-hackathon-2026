@@ -102,14 +102,37 @@ const validateMaintenance = async (req, res, next) => {
 };
 
 /**
- * Validate fuel log fields
- * TODO: Validate that cost and liters are positive numeric values.
+ * Validate fuel log fields.
+ * Enforces: vehicle_id is a positive integer, cost > 0, and liters > 0 for Fuel-type entries.
  */
 const validateFuelLog = (req, res, next) => {
-  const { vehicle_id, liters, cost } = req.body;
-  if (!vehicle_id || liters === undefined || cost === undefined) {
-    return res.status(400).json({ error: 'Vehicle ID, liters, and cost are required.' });
+  const { vehicle_id, liters, cost, expense_type } = req.body;
+
+  if (!vehicle_id) {
+    return res.status(400).json({ error: 'Vehicle ID is required.' });
   }
+  if (isNaN(Number(vehicle_id)) || Number(vehicle_id) <= 0) {
+    return res.status(400).json({ error: 'Vehicle ID must be a valid positive integer.' });
+  }
+  if (cost === undefined || cost === null || cost === '') {
+    return res.status(400).json({ error: 'Cost is required.' });
+  }
+  const costNum = Number(cost);
+  if (isNaN(costNum) || costNum <= 0) {
+    return res.status(400).json({ error: 'Cost must be a positive number greater than 0.' });
+  }
+  // Liters required and positive for Fuel entries
+  const isFuelType = !expense_type || expense_type === 'Fuel';
+  if (isFuelType) {
+    if (liters === undefined || liters === null || liters === '') {
+      return res.status(400).json({ error: 'Liters is required for Fuel expense entries.' });
+    }
+    const litersNum = Number(liters);
+    if (isNaN(litersNum) || litersNum <= 0) {
+      return res.status(400).json({ error: 'Liters must be a positive number greater than 0.' });
+    }
+  }
+
   next();
 };
 
