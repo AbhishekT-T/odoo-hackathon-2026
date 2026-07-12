@@ -164,7 +164,7 @@ const TripManagement = () => {
 
   // Only allow Available vehicles / drivers in dispatch pool
   const availableVehicles = vehicles.filter(v => v.status === 'Available');
-  const availableDrivers = drivers.filter(d => d.status === 'Available');
+  const availableDrivers = drivers; // Allow assigning a trip to any driver
 
   if (loading) return <div style={{ padding: '2rem' }}>Loading trip plans...</div>;
 
@@ -280,7 +280,7 @@ const TripManagement = () => {
                 <select name="driver_id" className="form-control" value={formData.driver_id} onChange={handleInputChange} required>
                   <option value="">-- Choose Driver --</option>
                   {availableDrivers.map(d => (
-                    <option key={d.id} value={d.id}>{d.name} (Safety Score: {d.safety_score})</option>
+                    <option key={d.id} value={d.id}>{d.name} (Status: {d.status}, Safety Score: {d.safety_score})</option>
                   ))}
                 </select>
               </div>
