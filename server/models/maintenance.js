@@ -51,6 +51,17 @@ const Maintenance = {
   delete: async (id) => {
     const result = await db.query('DELETE FROM maintenances WHERE id = $1 RETURNING *', [id]);
     return result.rows[0];
+  },
+
+  hasActiveMaintenance: async (vehicleId, excludeId = null) => {
+    let query = "SELECT COUNT(*) FROM maintenances WHERE vehicle_id = $1 AND status = 'Active'";
+    let params = [vehicleId];
+    if (excludeId) {
+      query += ' AND id != $2';
+      params.push(excludeId);
+    }
+    const result = await db.query(query, params);
+    return parseInt(result.rows[0].count) > 0;
   }
 };
 

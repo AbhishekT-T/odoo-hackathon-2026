@@ -41,6 +41,14 @@ const Vehicle = {
   delete: async (id) => {
     const result = await db.query('DELETE FROM vehicles WHERE id = $1 RETURNING *', [id]);
     return result.rows[0];
+  },
+
+  updateStatus: async (id, status) => {
+    const result = await db.query(
+      'UPDATE vehicles SET status = $1 WHERE id = $2 RETURNING *',
+      [status, id]
+    );
+    return result.rows[0];
   }
 };
 
