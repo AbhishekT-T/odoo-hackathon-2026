@@ -49,3 +49,35 @@ exports.login = async (req, res) => {
     res.status(500).json({ error: 'Server error during login: ' + err.message });
   }
 };
+
+/**
+ * Handle user registration
+ */
+exports.register = async (req, res) => {
+  try {
+    const { email, password, name, role } = req.body;
+
+    if (!email || !password || !name) {
+      return res.status(400).json({ error: 'Email, password, and name are required.' });
+    }
+
+    // Check if email already exists
+    const existingResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (existingResult.rows.length > 0) {
+      return res.status(400).json({ error: 'Email is already registered.' });
+    }
+
+    const passwordHash = bcrypt.hashSync(password, 10);
+    const result = await pool.query(
+      'INSERT INTO users (email, password_hash, name, role) VALUES ($1, $2, $3, $4) RETURNING id, email, name, role',
+      [email, passwordHash, name, role || 'Fleet Manager']
+    );
+
+    res.status(201).json({
+      message: 'User registered successfully.',
+      user: result.rows[0]
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error during registration: ' + err.message });
+  }
+};
