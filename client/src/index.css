@@ -355,7 +355,7 @@ tr:hover td {
 
 .modal-footer {
   display: flex;
-  justify-content: flex-end;
+  justify: flex-end;
   gap: 1rem;
   margin-top: 1.5rem;
 }

@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+// Force nodemon reload to pick up env vars
 require('dotenv').config();
 
 const vehicleRoutes = require('./routes/vehicleRoutes');
@@ -24,6 +25,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Register routes
+app.use('/api/auth', authRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/drivers', driverRoutes);
 app.use('/api/trips', tripRoutes);

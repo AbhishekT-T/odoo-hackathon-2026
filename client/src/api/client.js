@@ -10,7 +10,10 @@ const apiClient = axios.create({
 
 // Request interceptor (can be used to inject JWT token in the future)
 apiClient.interceptors.request.use((config) => {
-  // TODO: Add Authorization header dynamically when auth logic is added
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
   return config;
 }, (error) => {
   return Promise.reject(error);

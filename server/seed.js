@@ -1,11 +1,17 @@
+require('dotenv').config();
 const { pool } = require('./db');
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcryptjs');
 
 async function seed() {
   console.log('Starting database seeding...');
 
   try {
+    // Drop existing tables to ensure schema updates apply
+    console.log('Dropping existing tables...');
+    await pool.query('DROP TABLE IF EXISTS users, fuel_logs, maintenances, trips, drivers, vehicles CASCADE;');
+
     // Read and run schema.sql to ensure tables exist
     const schemaSql = fs.readFileSync(path.join(__dirname, '../database/schema.sql'), 'utf8');
     await pool.query(schemaSql);
@@ -14,13 +20,13 @@ async function seed() {
     // Clear existing data to allow fresh seeds
     await pool.query('TRUNCATE TABLE fuel_logs, maintenances, trips, drivers, vehicles, users RESTART IDENTITY CASCADE;');
 
-    // Insert Vehicles
+    // Insert Vehicles with Type and Region
     const vehiclesResult = await pool.query(`
-      INSERT INTO vehicles (registration_number, name, type, max_load_capacity, odometer, acquisition_cost, status)
+      INSERT INTO vehicles (registration_number, name, type, max_load_capacity, odometer, acquisition_cost, status, region)
       VALUES 
-        ('TX-707-VN', 'Van-05', 'Delivery Van', 500, 1000.0, 25000.0, 'Available'),
-        ('TX-909-OP', 'Ford Transit Heavy Truck', 'Heavy Duty Truck', 15000, 45200.0, 85000.0, 'Available'),
-        ('TX-404-SH', 'Mercedes Sprinter Cargo', 'Delivery Van', 3500, 12000.0, 35000.0, 'In Shop')
+        ('TX-707-VN', 'Van-05', 'Van', 500, 1000.0, 25000.0, 'Available', 'North'),
+        ('TX-909-OP', 'Ford Transit Heavy Truck', 'Truck', 15000, 45200.0, 85000.0, 'Available', 'East'),
+        ('TX-404-SH', 'Mercedes Sprinter Cargo', 'Van', 3500, 12000.0, 35000.0, 'In Shop', 'West')
       RETURNING id, name;
     `);
     console.log('Seeded vehicles.');

@@ -1,0 +1,139 @@
+{
+  "vehicles": [
+    {
+      "id": 1,
+      "registration_number": "TX-707-VN",
+      "name": "Van-05",
+      "type": "Delivery Van",
+      "max_load_capacity": 500,
+      "odometer": 1000,
+      "acquisition_cost": 25000,
+      "status": "Available"
+    },
+    {
+      "id": 2,
+      "registration_number": "TX-909-OP",
+      "name": "Ford Transit Heavy Truck",
+      "type": "Heavy Duty Truck",
+      "max_load_capacity": 15000,
+      "odometer": 45200,
+      "acquisition_cost": 85000,
+      "status": "Available"
+    },
+    {
+      "id": 3,
+      "registration_number": "TX-404-SH",
+      "name": "Mercedes Sprinter Cargo",
+      "type": "Delivery Van",
+      "max_load_capacity": 3500,
+      "odometer": 12000,
+      "acquisition_cost": 35000,
+      "status": "Available"
+    }
+  ],
+  "drivers": [
+    {
+      "id": 1,
+      "name": "Alex",
+      "license_number": "DL-99999X",
+      "license_category": "Class B CDL",
+      "license_expiry_date": "2027-07-12",
+      "contact_number": "+1 555-0177",
+      "safety_score": 95,
+      "status": "Available"
+    },
+    {
+      "id": 2,
+      "name": "Alice Smith",
+      "license_number": "DL-88271A",
+      "license_category": "Class A CDL",
+      "license_expiry_date": "2028-07-11",
+      "contact_number": "+1 555-0199",
+      "safety_score": 98.5,
+      "status": "Available"
+    },
+    {
+      "id": 3,
+      "name": "Bob Miller",
+      "license_number": "DL-11029B",
+      "license_category": "Class B CDL",
+      "license_expiry_date": "2027-01-08",
+      "contact_number": "+1 555-0144",
+      "safety_score": 72,
+      "status": "Suspended"
+    },
+    {
+      "id": 4,
+      "name": "r5y",
+      "license_number": "grdgdr",
+      "license_category": "Class A CDL",
+      "license_expiry_date": "2026-07-21",
+      "contact_number": "w4g54g",
+      "safety_score": 100,
+      "status": "Available"
+    }
+  ],
+  "trips": [
+    {
+      "id": 2,
+      "source": "Chicago Depot",
+      "destination": "New York Hub",
+      "vehicle_id": 2,
+      "driver_id": 2,
+      "cargo_weight": 12500,
+      "planned_distance": 1270,
+      "status": "Dispatched"
+    }
+  ],
+  "maintenances": [],
+  "fuel_logs": [
+    {
+      "id": 2,
+      "vehicle_id": 2,
+      "liters": 320,
+      "cost": 640,
+      "date": "2026-07-12",
+      "expense_type": "Fuel"
+    }
+  ],
+  "documents": [
+    {
+      "id": 1,
+      "entity_type": "vehicle",
+      "entity_id": 1,
+      "document_type": "Registration Certificate (RC)",
+      "file_name": "rc_van_05.pdf",
+      "file_url": "#",
+      "expiry_date": "2030-12-31",
+      "status": "Active"
+    },
+    {
+      "id": 2,
+      "entity_type": "driver",
+      "entity_id": 1,
+      "document_type": "Driving License",
+      "file_name": "license_alex.pdf",
+      "file_url": "#",
+      "expiry_date": "2027-06-30",
+      "status": "Active"
+    },
+    {
+      "id": 3,
+      "entity_type": "driver",
+      "entity_id": 3,
+      "document_type": "Aadhaar/PAN (ID Proof)",
+      "file_name": "defdv",
+      "file_url": "#",
+      "expiry_date": null,
+      "status": "Active"
+    }
+  ],
+  "nextIds": {
+    "vehicles": 6,
+    "drivers": 5,
+    "trips": 2,
+    "maintenances": 3,
+    "fuel_logs": 2,
+    "documents": 5
+  }
+}

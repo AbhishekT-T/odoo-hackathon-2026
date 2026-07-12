@@ -30,7 +30,10 @@ exports.getVehicleById = async (req, res) => {
  */
 exports.createVehicle = async (req, res) => {
   try {
-    // TODO: Verify registration_number is unique before creating (business rules)
+    const existing = await Vehicle.getByRegistrationNumber(req.body.registration_number);
+    if (existing) {
+      return res.status(400).json({ error: 'Vehicle registration number must be unique.' });
+    }
     const newVehicle = await Vehicle.create(req.body);
     res.status(201).json(newVehicle);
   } catch (err) {
@@ -43,6 +46,12 @@ exports.createVehicle = async (req, res) => {
  */
 exports.updateVehicle = async (req, res) => {
   try {
+    if (req.body.registration_number) {
+      const existing = await Vehicle.getByRegistrationNumber(req.body.registration_number);
+      if (existing && existing.id !== parseInt(req.params.id)) {
+        return res.status(400).json({ error: 'Vehicle registration number must be unique.' });
+      }
+    }
     const updatedVehicle = await Vehicle.update(req.params.id, req.body);
     if (!updatedVehicle) return res.status(404).json({ error: 'Vehicle not found.' });
     res.json(updatedVehicle);
@@ -60,6 +69,9 @@ exports.deleteVehicle = async (req, res) => {
     if (!deleted) return res.status(404).json({ error: 'Vehicle not found.' });
     res.json({ message: 'Vehicle deleted successfully.', vehicle: deleted });
   } catch (err) {
+    if (err.code === '23503') {
+      return res.status(400).json({ error: 'Cannot delete vehicle because it has associated trips or maintenance records.' });
+    }
     res.status(500).json({ error: 'Server error deleting vehicle: ' + err.message });
   }
 };

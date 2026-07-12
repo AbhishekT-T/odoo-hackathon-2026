@@ -1,0 +1,135 @@
+========================================================================
+             TRANSITOPS HACKATHON WORK DIVISION GUIDE (TXT VERSION)
+========================================================================
+
+This guide breaks down every file in the project, explains its purpose,
+and maps out a clear work allocation strategy for 3-person and 4-person teams.
+
+------------------------------------------------------------------------
+1. File-by-File Explanation (What and Why)
+------------------------------------------------------------------------
+
+* database/schema.sql
+  - What it does: Defines database tables (vehicles, drivers, trips, etc.).
+  - Why it is needed: Ensures consistent DB structures across all systems.
+
+* server/db.js
+  - What it does: Sets up PostgreSQL connection pool.
+  - Why it is needed: Enables backend database queries dynamically.
+
+* server/seed.js
+  - What it does: Automates table resets and loads seed mockup data.
+  - Why it is needed: Allows teammates to start testing on day one.
+
+* server/server.js
+  - What it does: Bootstraps Express, registers routes, manages CORS.
+  - Why it is needed: Backend entrypoint for all API interactions.
+
+* server/middleware/auth.js
+  - What it does: Validates request tokens/roles.
+  - Why it is needed: Protects routes and configures RBAC.
+
+* server/validators/inputValidators.js
+  - What it does: Houses validator stubs.
+  - Why it is needed: Sanitizes incoming request body elements.
+
+* server/controllers/* (vehicle, driver, trip, maintenance, fuelLog, dashboard, reports)
+  - What it does: Express route logic handlers.
+  - Why it is needed: Placeholders where business logic is implemented.
+
+* server/models/* (vehicle, driver, trip, maintenance, fuelLog)
+  - What it does: Direct SQL database queries.
+  - Why it is needed: Communicates with tables via the pg pool.
+
+* server/routes/* (vehicle, driver, trip, maintenance, fuelLog, dashboard, reports)
+  - What it does: Maps endpoints to controllers.
+  - Why it is needed: Organizes relative REST endpoints.
+
+* client/src/App.jsx
+  - What it does: Maps frontend URL paths to pages.
+  - Why it is needed: Core React Router setup.
+
+* client/src/index.css
+  - What it does: Styles components.
+  - Why it is needed: Premium dark-mode layout parameters.
+
+* client/src/api/* (vehicles, drivers, trips, maintenance, fuelLogs, dashboard, reports)
+  - What it does: API fetch callers.
+  - Why it is needed: Connects frontend page states to backend routes.
+
+* client/src/pages/* (Dashboard, VehicleRegistry, DriverManagement, TripManagement, Maintenance, FuelExpense, Reports)
+  - What it does: View pages with grids, modals, and buttons.
+  - Why it is needed: Core user interface.
+
+------------------------------------------------------------------------
+2. Work Division for a 3-Person Team
+------------------------------------------------------------------------
+
+[Person 1: Fleet Registry & Maintenance]
+- Responsibility: Vehicle registry, diagnostic logs, shop toggle triggers.
+- Target Files:
+  * server/controllers/vehicleController.js & server/models/vehicle.js
+  * server/controllers/maintenanceController.js & server/models/maintenance.js
+  * client/src/pages/VehicleRegistry.jsx
+  * client/src/pages/Maintenance.jsx
+- Goals:
+  1. Trigger status to 'In Shop' on maintenance creation.
+  2. Restore status to 'Available' on closing maintenance.
+  3. Validate odometer and load capacity attributes.
+
+[Person 2: Drivers, Compliance & Trip Dispatcher]
+- Responsibility: Driver directories, safety scores, dispatch state transitions.
+- Target Files:
+  * server/controllers/driverController.js & server/models/driver.js
+  * server/controllers/tripController.js & server/models/trip.js
+  * client/src/pages/DriverManagement.jsx
+  * client/src/pages/TripManagement.jsx
+- Goals:
+  1. Check driver/vehicle availability on dispatch.
+  2. Prevent dispatch if cargo exceeds max or license is expired/suspended.
+  3. Change status to 'On Trip' on dispatch and back to 'Available' on completion/cancellation.
+
+[Person 3: Finance, Analytics, Dashboard & Security]
+- Responsibility: Fuel logs, ROI aggregates, KPIs, CSV export, and RBAC.
+- Target Files:
+  * server/controllers/fuelLogController.js & server/models/fuelLog.js
+  * server/controllers/dashboardController.js & server/controllers/reportsController.js
+  * server/middleware/auth.js
+  * client/src/pages/Dashboard.jsx, FuelExpense.jsx, Reports.jsx
+- Goals:
+  1. Log fuel costs and track vehicle operational cost (Fuel + Maintenance).
+  2. Calculate KPI stats on Dashboard and vehicle performance ROI on Reports.
+  3. Complete CSV downloads and define RBAC authentication rules.
+
+------------------------------------------------------------------------
+3. Work Division for a 4-Person Team (Highly Specialized)
+------------------------------------------------------------------------
+
+[Person 1: Fleet Asset Manager (Vehicles & Maintenance)]
+- Responsibility: Vehicle records and shop releases.
+- Target Files:
+  * server/controllers/vehicleController.js, server/models/vehicle.js
+  * server/controllers/maintenanceController.js, server/models/maintenance.js
+  * client/src/pages/VehicleRegistry.jsx, client/src/pages/Maintenance.jsx
+
+[Person 2: Driver Profiles, Compliance & Role Security]
+- Responsibility: Driver directories, CDL records, auth/RBAC filters.
+- Target Files:
+  * server/controllers/driverController.js, server/models/driver.js
+  * server/middleware/auth.js
+  * client/src/pages/DriverManagement.jsx
+
+[Person 3: Trip Dispatch & State Machine Operations]
+- Responsibility: Booking pipelines and dispatching.
+- Target Files:
+  * server/controllers/tripController.js, server/models/trip.js
+  * server/validators/inputValidators.js
+  * client/src/pages/TripManagement.jsx
+
+[Person 4: Finance, Dashboard KPIs & Reports Export]
+- Responsibility: Receipts, calculations (ROI, efficiency), CSV export, KPI widgets.
+- Target Files:
+  * server/controllers/fuelLogController.js, server/models/fuelLog.js
+  * server/controllers/dashboardController.js, server/controllers/reportsController.js
+  * client/src/pages/Dashboard.jsx, FuelExpense.jsx, Reports.jsx
+========================================================================

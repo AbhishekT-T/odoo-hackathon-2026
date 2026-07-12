@@ -1,18 +1,27 @@
-// Stub authentication and Role-Based Access Control (RBAC) middleware
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'transitops-super-secret-key-1234';
 
 /**
  * Middleware to authenticate user and extract role.
- * TODO: Implement JWT/Session verification.
- * For now, this stub automatically grants access and assigns a default 'Fleet Manager' role.
  */
 const authenticateUser = (req, res, next) => {
-  // Simulating an authenticated user
-  req.user = {
-    id: 1,
-    email: 'admin@transitops.com',
-    role: 'Fleet Manager' // Roles: 'Fleet Manager', 'Driver', 'Safety Officer', 'Financial Analyst'
-  };
-  next();
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) {
+    return res.status(401).json({ error: 'Access denied: Authentication token required.' });
+  }
+
+  const token = authHeader.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Access denied: Authentication token required.' });
+  }
+
+  try {
+    const verified = jwt.verify(token, JWT_SECRET);
+    req.user = verified;
+    next();
+  } catch (err) {
+    res.status(401).json({ error: 'Access denied: Invalid authentication token.' });
+  }
 };
 
 /**

@@ -64,6 +64,24 @@ const Maintenance = () => {
       .catch(err => alert(err.message));
   };
 
+  const renderMaintenanceProgress = (status) => {
+    const isActive = status === 'Active';
+    const isClosed = status === 'Closed';
+    return (
+      <div className="stepper-progress maint">
+        <div className={`step active ${isActive ? 'active' : 'completed'}`}>
+          <div className="step-dot"></div>
+          <span className="step-label">Active</span>
+        </div>
+        <div className={`step-line ${isClosed ? 'active-completed' : ''}`}></div>
+        <div className={`step ${isClosed ? 'active completed' : 'inactive'}`}>
+          <div className="step-dot"></div>
+          <span className="step-label">Closed</span>
+        </div>
+      </div>
+    );
+  };
+
   if (loading) return <div style={{ padding: '2rem' }}>Loading maintenance logs...</div>;
 
   return (
@@ -96,9 +114,12 @@ const Maintenance = () => {
                 <td>{l.description || 'No description provided.'}</td>
                 <td>${parseFloat(l.cost).toLocaleString()}</td>
                 <td>
-                  <span className={`badge badge-${l.status.toLowerCase()}`}>
-                    {l.status}
-                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    <span className={`badge badge-${l.status.toLowerCase()}`} style={{ width: 'fit-content' }}>
+                      {l.status}
+                    </span>
+                    {renderMaintenanceProgress(l.status)}
+                  </div>
                 </td>
                 <td>
                   {l.status === 'Active' && (

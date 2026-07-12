@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS vehicles (
     max_load_capacity NUMERIC(10,2) NOT NULL,
     odometer NUMERIC(10,2) DEFAULT 0.0,
     acquisition_cost NUMERIC(12,2) DEFAULT 0.0,
-    status VARCHAR(20) DEFAULT 'Available' CHECK (status IN ('Available', 'On Trip', 'In Shop', 'Retired'))
+    status VARCHAR(20) DEFAULT 'Available' CHECK (status IN ('Available', 'On Trip', 'In Shop', 'Retired')),
+    region VARCHAR(50) DEFAULT 'National'
 );
 
 -- Drivers Table
@@ -65,4 +66,13 @@ CREATE TABLE IF NOT EXISTS fuel_logs (
     cost NUMERIC(12,2) NOT NULL,
     date DATE NOT NULL DEFAULT CURRENT_DATE,
     expense_type VARCHAR(50) DEFAULT 'Fuel'
+);
+
+-- Users Table
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT 'Fleet Manager'
 );
