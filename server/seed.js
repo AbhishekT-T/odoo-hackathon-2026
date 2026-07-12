@@ -17,13 +17,8 @@ async function seed() {
     await pool.query(schemaSql);
     console.log('Database tables verified/created.');
 
-    // Seed Admin User
-    const passwordHash = bcrypt.hashSync('password123', 10);
-    await pool.query(`
-      INSERT INTO users (email, password_hash, name, role)
-      VALUES ($1, $2, $3, $4);
-    `, ['admin@transitops.com', passwordHash, 'Admin User', 'Fleet Manager']);
-    console.log('Seeded admin user.');
+    // Clear existing data to allow fresh seeds
+    await pool.query('TRUNCATE TABLE fuel_logs, maintenances, trips, drivers, vehicles, users RESTART IDENTITY CASCADE;');
 
     // Insert Vehicles with Type and Region
     const vehiclesResult = await pool.query(`

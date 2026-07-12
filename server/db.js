@@ -3,7 +3,10 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const { Pool } = require('pg');
 
-const DB_FILE = path.join(__dirname, 'db.json');
+// Initialize the database connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:indus.hackthon@127.0.0.1:5432/hackdemo'
+});
 
 let realPool = null;
 if (process.env.USE_POSTGRES === 'true') {
@@ -599,11 +602,15 @@ const query = async (text, params = []) => {
 
   if (sql.startsWith("SELECT COUNT(*) FROM trips t")) {
     let trips = data.trips;
-    
+
     if (sql.includes("t.status = 'Dispatched'")) {
       trips = trips.filter(t => t.status === 'Dispatched');
     } else if (sql.includes("t.status = 'Draft'")) {
       trips = trips.filter(t => t.status === 'Draft');
+    } else if (sql.includes("t.status = 'Completed'")) {
+      trips = trips.filter(t => t.status === 'Completed');
+    } else if (sql.includes("t.status = 'Cancelled'")) {
+      trips = trips.filter(t => t.status === 'Cancelled');
     }
 
     const getParamValue = (field) => {

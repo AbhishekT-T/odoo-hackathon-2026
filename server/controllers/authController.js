@@ -1,109 +1,128 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const { pool } = require('../db');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'transitops-super-secret-key-1234';
+const SALT_ROUNDS = 10;
 
-/**
- * Handle user login and sign JWT token
- */
-exports.login = async (req, res) => {
+// Register a new user
+const register = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { username, email, password, full_name, role = 'user' } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required.' });
+    // Validate input
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: 'Username, email, and password are required' });
     }
 
-    // Find user in the database
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-    const user = result.rows[0];
-
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
-    }
-
-    // Compare password hash
-    const isMatch = bcrypt.compareSync(password, user.password_hash);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
-    }
-
-    // Auto-create driver profile on login if role is Driver and no profile exists
-    if (user.role === 'Driver') {
-      const driverRes = await pool.query('SELECT * FROM drivers ORDER BY id DESC');
-      const driverExists = driverRes.rows.some(d => d.name.toLowerCase() === user.name.toLowerCase());
-      if (!driverExists) {
-        const defLicense = 'LIC-' + Math.floor(100000 + Math.random() * 900000);
-        const defExpiry = new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0];
-        await pool.query(
-          `INSERT INTO drivers (name, license_number, license_category, license_expiry_date, contact_number, safety_score, status) 
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-          [user.name, defLicense, 'Standard Driver License', defExpiry, 'N/A', 100.0, 'Available']
-        );
-      }
-    }
-
-    // Sign JWT
-    const token = jwt.sign(
-      { id: user.id, email: user.email, name: user.name, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '24h' }
+    // Check if user already exists
+    const existingUser = await pool.query(
+      'SELECT id FROM users WHERE username = $1 OR email = $2',
+      [username, email]
     );
 
-    res.json({
-      token,
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({ error: 'Username or email already exists' });
+    }
+
+    // Hash the password
+    const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
+
+    // Insert new user
+    const result = await pool.query(
+      `INSERT INTO users (username, email, password_hash, full_name, role)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, username, email, full_name, role, created_at`,
+      [username, email, password_hash, full_name, role]
+    );
+
+    const user = result.rows[0];
+
+    res.status(201).json({
+      message: 'User registered successfully',
       user: {
         id: user.id,
+        username: user.username,
         email: user.email,
-        name: user.name,
-        role: user.role
+        full_name: user.full_name,
+        role: user.role,
+        created_at: user.created_at
       }
     });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error during login: ' + err.message });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Internal server error during registration' });
   }
 };
 
-/**
- * Handle user registration
- */
-exports.register = async (req, res) => {
+// Login user
+const login = async (req, res) => {
   try {
-    const { email, password, name, role } = req.body;
+    const { username, password } = req.body;
 
-    if (!email || !password || !name) {
-      return res.status(400).json({ error: 'Email, password, and name are required.' });
+    // Validate input
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
     }
 
-    // Check if email already exists
-    const existingResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-    if (existingResult.rows.length > 0) {
-      return res.status(400).json({ error: 'Email is already registered.' });
-    }
-
-    const passwordHash = bcrypt.hashSync(password, 10);
+    // Find user by username or email
     const result = await pool.query(
-      'INSERT INTO users (email, password_hash, name, role) VALUES ($1, $2, $3, $4) RETURNING id, email, name, role',
-      [email, passwordHash, name, role || 'Fleet Manager']
+      'SELECT * FROM users WHERE username = $1 OR email = $1',
+      [username]
     );
 
-    // Auto-create driver profile on registration if role is Driver
-    if (role === 'Driver') {
-      const defLicense = 'LIC-' + Math.floor(100000 + Math.random() * 900000);
-      const defExpiry = new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0];
-      await pool.query(
-        `INSERT INTO drivers (name, license_number, license_category, license_expiry_date, contact_number, safety_score, status) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-        [name, defLicense, 'Standard Driver License', defExpiry, 'N/A', 100.0, 'Available']
-      );
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    res.status(201).json({
-      message: 'User registered successfully.',
-      user: result.rows[0]
+    const user = result.rows[0];
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Return user info (excluding password hash)
+    res.json({
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        full_name: user.full_name,
+        role: user.role,
+        created_at: user.created_at
+      }
     });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error during registration: ' + err.message });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error during login' });
   }
+};
+
+// Get current user profile
+const getProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const result = await pool.query(
+      'SELECT id, username, email, full_name, role, created_at FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ user: result.rows[0] });
+  } catch (error) {
+    console.error('Get profile error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  getProfile
 };
