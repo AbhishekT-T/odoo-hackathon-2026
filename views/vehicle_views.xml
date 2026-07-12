@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vehicle Tree View -->
+    <record id="view_transitops_vehicle_tree" model="ir.ui.view">
+        <field name="name">transitops.vehicle.tree</field>
+        <field name="model">transitops.vehicle</field>
+        <field name="arch" type="xml">
+            <tree string="Vehicles">
+                <field name="registration_number"/>
+                <field name="name"/>
+                <field name="type"/>
+                <field name="max_load_capacity"/>
+                <field name="odometer"/>
+                <field name="acquisition_cost"/>
+                <field name="total_operational_cost" sum="Total Operational Cost"/>
+                <field name="fuel_efficiency" avg="Average Fuel Efficiency"/>
+                <field name="roi"/>
+                <field name="status" widget="badge" decoration-info="status == 'available'" decoration-warning="status == 'on_trip'" decoration-danger="status == 'in_shop'" decoration-muted="status == 'retired'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vehicle Form View -->
+    <record id="view_transitops_vehicle_form" model="ir.ui.view">
+        <field name="name">transitops.vehicle.form</field>
+        <field name="model">transitops.vehicle</field>
+        <field name="arch" type="xml">
+            <form string="Vehicle">
+                <header>
+                    <button name="action_set_available" string="Set Available" type="object" class="oe_highlight" invisible="status == 'available'"/>
+                    <button name="action_set_on_trip" string="Set On Trip" type="object" invisible="status == 'on_trip'"/>
+                    <button name="action_set_in_shop" string="Set In Shop" type="object" class="btn-warning" invisible="status == 'in_shop'"/>
+                    <button name="action_set_retired" string="Retire Vehicle" type="object" class="btn-secondary" invisible="status == 'retired'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="available,on_trip,in_shop,retired"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="registration_number" string="Registration Number"/>
+                        <h1>
+                            <field name="registration_number" placeholder="e.g. AB-123-CD"/>
+                        </h1>
+                        <label for="name" string="Vehicle Name / Model"/>
+                        <h3>
+                            <field name="name" placeholder="e.g. Ford Transit Van 2024"/>
+                        </h3>
+                    </div>
+                    <notebook>
+                        <page string="General Info" name="general_info">
+                            <group>
+                                <group string="Specifications">
+                                    <field name="type"/>
+                                    <field name="max_load_capacity"/>
+                                </group>
+                                <group string="Financials &amp; Usage">
+                                    <field name="odometer"/>
+                                    <field name="acquisition_cost"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Operational Analytics" name="analytics">
+                            <group>
+                                <group string="Operational Costs">
+                                    <field name="total_fuel_cost"/>
+                                    <field name="total_maintenance_cost"/>
+                                    <field name="total_operational_cost"/>
+                                </group>
+                                <group string="Performance Metrics">
+                                    <field name="total_trip_revenue"/>
+                                    <field name="fuel_efficiency"/>
+                                    <field name="roi"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Maintenance History" name="maintenance">
+                            <field name="maintenance_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="description"/>
+                                    <field name="cost"/>
+                                    <field name="status"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Fuel &amp; Expense Logs" name="fuel_expenses">
+                            <field name="fuel_expense_ids" readonly="1">
+                                <tree>
+                                    <field name="date"/>
+                                    <field name="liters"/>
+                                    <field name="cost"/>
+                                    <field name="expense_type"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vehicle Search View -->
+    <record id="view_transitops_vehicle_search" model="ir.ui.view">
+        <field name="name">transitops.vehicle.search</field>
+        <field name="model">transitops.vehicle</field>
+        <field name="arch" type="xml">
+            <search string="Search Vehicles">
+                <field name="registration_number"/>
+                <field name="name"/>
+                <field name="type"/>
+                <filter string="Available" name="available" domain="[('status', '=', 'available')]"/>
+                <filter string="On Trip" name="on_trip" domain="[('status', '=', 'on_trip')]"/>
+                <filter string="In Shop" name="in_shop" domain="[('status', '=', 'in_shop')]"/>
+                <filter string="Retired" name="retired" domain="[('status', '=', 'retired')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Type" name="group_by_type" context="{'group_by': 'type'}"/>
+                    <filter string="Status" name="group_by_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vehicle Action -->
+    <record id="action_transitops_vehicle" model="actions.act_window">
+        <field name="name">Vehicles</field>
+        <field name="res_model">transitops.vehicle</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_transitops_vehicle_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first vehicle!
+            </p>
+        </field>
+    </record>
+</odoo>

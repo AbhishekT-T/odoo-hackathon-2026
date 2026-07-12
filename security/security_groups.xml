@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Security Category -->
+        <record id="module_category_transitops" model="ir.module.category">
+            <field name="name">Transit Operations</field>
+            <field name="description">Manage transport operations, vehicle fleets, and driver assignments.</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- Driver Group -->
+        <record id="group_transitops_driver" model="res.groups">
+            <field name="name">Driver</field>
+            <field name="category_id" ref="module_category_transitops"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- Safety Officer Group -->
+        <record id="group_transitops_safety" model="res.groups">
+            <field name="name">Safety Officer</field>
+            <field name="category_id" ref="module_category_transitops"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- Financial Analyst Group -->
+        <record id="group_transitops_analyst" model="res.groups">
+            <field name="name">Financial Analyst</field>
+            <field name="category_id" ref="module_category_transitops"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- Fleet Manager Group -->
+        <record id="group_transitops_manager" model="res.groups">
+            <field name="name">Fleet Manager</field>
+            <field name="category_id" ref="module_category_transitops"/>
+            <field name="implied_ids" eval="[(4, ref('group_transitops_driver')), (4, ref('group_transitops_safety')), (4, ref('group_transitops_analyst'))]"/>
+        </record>
+    </data>
+</odoo>

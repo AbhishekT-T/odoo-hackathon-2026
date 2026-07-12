@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Maintenance Tree View -->
+    <record id="view_transitops_maintenance_tree" model="ir.ui.view">
+        <field name="name">transitops.maintenance.tree</field>
+        <field name="model">transitops.maintenance</field>
+        <field name="arch" type="xml">
+            <tree string="Maintenance Records">
+                <field name="name"/>
+                <field name="vehicle_id"/>
+                <field name="description"/>
+                <field name="cost" sum="Total Maintenance Cost"/>
+                <field name="status" widget="badge" decoration-danger="status == 'active'" decoration-success="status == 'closed'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Maintenance Form View -->
+    <record id="view_transitops_maintenance_form" model="ir.ui.view">
+        <field name="name">transitops.maintenance.form</field>
+        <field name="model">transitops.maintenance</field>
+        <field name="arch" type="xml">
+            <form string="Maintenance Record">
+                <header>
+                    <button name="action_close_maintenance" string="Close Maintenance" type="object" class="oe_highlight" invisible="status == 'closed'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="active,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="vehicle_id"/>
+                            <field name="cost"/>
+                        </group>
+                        <group>
+                            <field name="description" placeholder="Describe the maintenance performed..."/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Maintenance Search View -->
+    <record id="view_transitops_maintenance_search" model="ir.ui.view">
+        <field name="name">transitops.maintenance.search</field>
+        <field name="model">transitops.maintenance</field>
+        <field name="arch" type="xml">
+            <search string="Search Maintenance Logs">
+                <field name="name"/>
+                <field name="vehicle_id"/>
+                <filter string="Active" name="active" domain="[('status', '=', 'active')]"/>
+                <filter string="Closed" name="closed" domain="[('status', '=', 'closed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Vehicle" name="group_by_vehicle" context="{'group_by': 'vehicle_id'}"/>
+                    <filter string="Status" name="group_by_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Maintenance Action -->
+    <record id="action_transitops_maintenance" model="actions.act_window">
+        <field name="name">Maintenance Logs</field>
+        <field name="res_model">transitops.maintenance</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_transitops_maintenance_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Log your first maintenance activity!
+            </p>
+        </field>
+    </record>
+</odoo>

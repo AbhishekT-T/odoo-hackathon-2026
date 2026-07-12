@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Fuel Expense Tree View -->
+    <record id="view_transitops_fuel_expense_tree" model="ir.ui.view">
+        <field name="name">transitops.fuel.expense.tree</field>
+        <field name="model">transitops.fuel.expense</field>
+        <field name="arch" type="xml">
+            <tree string="Fuel Logs" editable="bottom">
+                <field name="date"/>
+                <field name="vehicle_id"/>
+                <field name="expense_type"/>
+                <field name="liters" sum="Total Liters"/>
+                <field name="cost" sum="Total Cost"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Fuel Expense Form View -->
+    <record id="view_transitops_fuel_expense_form" model="ir.ui.view">
+        <field name="name">transitops.fuel.expense.form</field>
+        <field name="model">transitops.fuel.expense</field>
+        <field name="arch" type="xml">
+            <form string="Fuel Log">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="vehicle_id"/>
+                            <field name="expense_type"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="liters"/>
+                            <field name="cost"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Fuel Expense Pivot View -->
+    <record id="view_transitops_fuel_expense_pivot" model="ir.ui.view">
+        <field name="name">transitops.fuel.expense.pivot</field>
+        <field name="model">transitops.fuel.expense</field>
+        <field name="arch" type="xml">
+            <pivot string="Fuel Analysis" sample="1">
+                <field name="vehicle_id" type="row"/>
+                <field name="expense_type" type="col"/>
+                <field name="liters" type="measure"/>
+                <field name="cost" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Fuel Expense Graph View -->
+    <record id="view_transitops_fuel_expense_graph" model="ir.ui.view">
+        <field name="name">transitops.fuel.expense.graph</field>
+        <field name="model">transitops.fuel.expense</field>
+        <field name="arch" type="xml">
+            <graph string="Fuel Costs by Vehicle" type="bar" sample="1">
+                <field name="vehicle_id"/>
+                <field name="cost" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Fuel Expense Action -->
+    <record id="action_transitops_fuel_expense" model="actions.act_window">
+        <field name="name">Fuel Expenses</field>
+        <field name="res_model">transitops.fuel.expense</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Log fuel and vehicle electricity costs.
+            </p>
+        </field>
+    </record>
+
+    <!-- Vehicle Pivot View (ROI and Analytics) -->
+    <record id="view_transitops_vehicle_pivot" model="ir.ui.view">
+        <field name="name">transitops.vehicle.pivot</field>
+        <field name="model">transitops.vehicle</field>
+        <field name="arch" type="xml">
+            <pivot string="Fleet Performance &amp; ROI" sample="1">
+                <field name="type" type="row"/>
+                <field name="status" type="col"/>
+                <field name="total_operational_cost" type="measure"/>
+                <field name="total_trip_revenue" type="measure"/>
+                <field name="roi" type="measure"/>
+                <field name="fuel_efficiency" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Vehicle Graph View (ROI and Analytics) -->
+    <record id="view_transitops_vehicle_graph" model="ir.ui.view">
+        <field name="name">transitops.vehicle.graph</field>
+        <field name="model">transitops.vehicle</field>
+        <field name="arch" type="xml">
+            <graph string="Vehicle ROI Analysis" type="bar" sample="1">
+                <field name="name"/>
+                <field name="roi" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Dashboard: Trip Graph View -->
+    <record id="view_transitops_trip_graph" model="ir.ui.view">
+        <field name="name">transitops.trip.graph</field>
+        <field name="model">transitops.trip</field>
+        <field name="arch" type="xml">
+            <graph string="Trip Distance &amp; Cargo Analysis" type="bar" sample="1">
+                <field name="vehicle_id"/>
+                <field name="planned_distance" type="measure"/>
+                <field name="cargo_weight" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Dashboard: Trip Pivot View -->
+    <record id="view_transitops_trip_pivot" model="ir.ui.view">
+        <field name="name">transitops.trip.pivot</field>
+        <field name="model">transitops.trip</field>
+        <field name="arch" type="xml">
+            <pivot string="Trip Analytics" sample="1">
+                <field name="driver_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="planned_distance" type="measure"/>
+                <field name="revenue" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Dashboard Action (Pivot / Graph view of Vehicle Analytics) -->
+    <record id="action_transitops_dashboard" model="actions.act_window">
+        <field name="name">Operations Dashboard</field>
+        <field name="res_model">transitops.vehicle</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="view_id" ref="view_transitops_vehicle_pivot"/>
+    </record>
+</odoo>

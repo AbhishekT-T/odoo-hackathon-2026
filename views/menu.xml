@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Root Menu -->
+    <menuitem id="menu_transitops_root" name="Transit Ops" sequence="10"/>
+
+    <!-- Dashboard Menu -->
+    <menuitem id="menu_transitops_dashboard" name="Dashboard" parent="menu_transitops_root" action="action_transitops_dashboard" sequence="10"/>
+
+    <!-- Operations Menu Category -->
+    <menuitem id="menu_transitops_operations" name="Operations" parent="menu_transitops_root" sequence="20"/>
+    <menuitem id="menu_transitops_trips" name="Trips" parent="menu_transitops_operations" action="action_transitops_trip" sequence="10"/>
+    <menuitem id="menu_transitops_maintenance" name="Maintenance" parent="menu_transitops_operations" action="action_transitops_maintenance" sequence="20"/>
+
+    <!-- Resources Menu Category -->
+    <menuitem id="menu_transitops_resources" name="Resources" parent="menu_transitops_root" sequence="30"/>
+    <menuitem id="menu_transitops_vehicles" name="Vehicles" parent="menu_transitops_resources" action="action_transitops_vehicle" sequence="10"/>
+    <menuitem id="menu_transitops_drivers" name="Drivers" parent="menu_transitops_resources" action="action_transitops_driver" sequence="20"/>
+
+    <!-- Finance Menu Category -->
+    <menuitem id="menu_transitops_finance" name="Finance" parent="menu_transitops_root" sequence="40"/>
+    <menuitem id="menu_transitops_fuel_expense" name="Fuel &amp; Expenses" parent="menu_transitops_finance" action="action_transitops_fuel_expense" sequence="10"/>
+</odoo>

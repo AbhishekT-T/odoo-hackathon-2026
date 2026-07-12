@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Trip Tree View -->
+    <record id="view_transitops_trip_tree" model="ir.ui.view">
+        <field name="name">transitops.trip.tree</field>
+        <field name="model">transitops.trip</field>
+        <field name="arch" type="xml">
+            <tree string="Trips">
+                <field name="name"/>
+                <field name="source"/>
+                <field name="destination"/>
+                <field name="vehicle_id"/>
+                <field name="driver_id"/>
+                <field name="cargo_weight"/>
+                <field name="planned_distance"/>
+                <field name="revenue" sum="Total Revenue"/>
+                <field name="status" widget="badge" decoration-muted="status == 'draft'" decoration-info="status == 'dispatched'" decoration-success="status == 'completed'" decoration-danger="status == 'cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Trip Form View -->
+    <record id="view_transitops_trip_form" model="ir.ui.view">
+        <field name="name">transitops.trip.form</field>
+        <field name="model">transitops.trip</field>
+        <field name="arch" type="xml">
+            <form string="Trip">
+                <header>
+                    <button name="action_dispatch" string="Dispatch" type="object" class="oe_highlight" invisible="status != 'draft'"/>
+                    <button name="action_complete" string="Complete Trip" type="object" class="oe_highlight" invisible="status != 'dispatched'"/>
+                    <button name="action_cancel" string="Cancel" type="object" class="btn-secondary" invisible="status in ('completed', 'cancelled')"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,dispatched,completed,cancelled"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Route Details">
+                            <field name="source" placeholder="Departure Location" readonly="status != 'draft'"/>
+                            <field name="destination" placeholder="Destination Location" readonly="status != 'draft'"/>
+                            <field name="planned_distance" readonly="status != 'draft'"/>
+                            <field name="revenue" readonly="status != 'draft'"/>
+                        </group>
+                        <group string="Assignment &amp; Cargo">
+                            <field name="vehicle_id" domain="[('status', '=', 'available')]" readonly="status != 'draft'"/>
+                            <field name="driver_id" domain="[('status', '=', 'available')]" readonly="status != 'draft'"/>
+                            <field name="cargo_weight" readonly="status != 'draft'"/>
+                        </group>
+                    </group>
+                    <group string="Completion &amp; Fuel Log" invisible="status == 'draft'">
+                        <group>
+                            <field name="end_odometer" readonly="status == 'completed'" required="status == 'dispatched'"/>
+                            <field name="fuel_consumed" readonly="status == 'completed'" required="status == 'dispatched'"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Trip Search View -->
+    <record id="view_transitops_trip_search" model="ir.ui.view">
+        <field name="name">transitops.trip.search</field>
+        <field name="model">transitops.trip</field>
+        <field name="arch" type="xml">
+            <search string="Search Trips">
+                <field name="name"/>
+                <field name="source"/>
+                <field name="destination"/>
+                <field name="vehicle_id"/>
+                <field name="driver_id"/>
+                <filter string="Draft" name="draft" domain="[('status', '=', 'draft')]"/>
+                <filter string="Dispatched" name="dispatched" domain="[('status', '=', 'dispatched')]"/>
+                <filter string="Completed" name="completed" domain="[('status', '=', 'completed')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('status', '=', 'cancelled')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Vehicle" name="group_by_vehicle" context="{'group_by': 'vehicle_id'}"/>
+                    <filter string="Driver" name="group_by_driver" context="{'group_by': 'driver_id'}"/>
+                    <filter string="Status" name="group_by_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Trip Action -->
+    <record id="action_transitops_trip" model="actions.act_window">
+        <field name="name">Trips</field>
+        <field name="res_model">transitops.trip</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_transitops_trip_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Plan your first trip!
+            </p>
+        </field>
+    </record>
+</odoo>
