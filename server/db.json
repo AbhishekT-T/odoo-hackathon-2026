@@ -1,20 +1,4 @@
 {
-  "users": [
-    {
-      "id": 1,
-      "email": "admin@transitops.com",
-      "password_hash": "$2b$10$abQtG1zZ2btjt82qn7HG5.FuXbsU1eFWfouPDqFH9AORgihvkLciS",
-      "name": "Admin User",
-      "role": "Fleet Manager"
-    },
-    {
-      "id": 2,
-      "email": "admin@transitops.com",
-      "password_hash": "$2b$10$1eqMsZpnGVzTPMx4OAI4TeEbJHkqrRr1JA20XqWLWnjtHMEk63OKG",
-      "name": "Admin User",
-      "role": "Fleet Manager"
-    }
-  ],
   "vehicles": [
     {
       "id": 1,
@@ -44,7 +28,7 @@
       "max_load_capacity": 3500,
       "odometer": 12000,
       "acquisition_cost": 35000,
-      "status": "In Shop"
+      "status": "Available"
     }
   ],
   "drivers": [
@@ -77,32 +61,34 @@
       "contact_number": "+1 555-0144",
       "safety_score": 72,
       "status": "Suspended"
+    },
+    {
+      "id": 4,
+      "name": "r5y",
+      "license_number": "grdgdr",
+      "license_category": "Class A CDL",
+      "license_expiry_date": "2026-07-21",
+      "contact_number": "w4g54g",
+      "safety_score": 100,
+      "status": "Available"
     }
   ],
   "trips": [
     {
-      "id": 1,
+      "id": 2,
       "source": "Chicago Depot",
       "destination": "New York Hub",
       "vehicle_id": 2,
       "driver_id": 2,
       "cargo_weight": 12500,
       "planned_distance": 1270,
-      "status": "Draft"
+      "status": "Dispatched"
     }
   ],
-  "maintenances": [
-    {
-      "id": 1,
-      "vehicle_id": 3,
-      "description": "Brake pad replacement and engine check.",
-      "cost": 450,
-      "status": "Active"
-    }
-  ],
+  "maintenances": [],
   "fuel_logs": [
     {
-      "id": 1,
+      "id": 2,
       "vehicle_id": 2,
       "liters": 320,
       "cost": 640,
@@ -130,15 +116,24 @@
       "file_url": "#",
       "expiry_date": "2027-06-30",
       "status": "Active"
+    },
+    {
+      "id": 3,
+      "entity_type": "driver",
+      "entity_id": 3,
+      "document_type": "Aadhaar/PAN (ID Proof)",
+      "file_name": "defdv",
+      "file_url": "#",
+      "expiry_date": null,
+      "status": "Active"
     }
   ],
   "nextIds": {
-    "users": 3,
-    "vehicles": 4,
-    "drivers": 4,
+    "vehicles": 6,
+    "drivers": 5,
     "trips": 2,
-    "maintenances": 2,
+    "maintenances": 3,
     "fuel_logs": 2,
-    "documents": 3
+    "documents": 5
   }
 }
