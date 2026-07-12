@@ -60,6 +60,9 @@ exports.deleteDriver = async (req, res) => {
     if (!deleted) return res.status(404).json({ error: 'Driver not found.' });
     res.json({ message: 'Driver deleted successfully.', driver: deleted });
   } catch (err) {
+    if (err.code === '23503') {
+      return res.status(400).json({ error: 'Cannot delete driver because they have associated trips or document logs.' });
+    }
     res.status(500).json({ error: 'Server error deleting driver: ' + err.message });
   }
 };

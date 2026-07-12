@@ -27,12 +27,26 @@ function readDB() {
       fuel_logs: [
         { id: 1, vehicle_id: 2, liters: 320.0, cost: 640.0, date: new Date().toISOString().split('T')[0], expense_type: 'Fuel' }
       ],
-      nextIds: { vehicles: 4, drivers: 4, trips: 2, maintenances: 2, fuel_logs: 2 }
+      documents: [
+        { id: 1, entity_type: 'vehicle', entity_id: 1, document_type: 'Registration Certificate (RC)', file_name: 'rc_van_05.pdf', file_url: '#', expiry_date: '2030-12-31', status: 'Active' },
+        { id: 2, entity_type: 'driver', entity_id: 1, document_type: 'Driving License', file_name: 'license_alex.pdf', file_url: '#', expiry_date: '2027-06-30', status: 'Active' }
+      ],
+      nextIds: { vehicles: 4, drivers: 4, trips: 2, maintenances: 2, fuel_logs: 2, documents: 3 }
     };
     fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2));
     return initialData;
   }
-  return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+  const dbData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+  if (!dbData.documents) {
+    dbData.documents = [
+      { id: 1, entity_type: 'vehicle', entity_id: 1, document_type: 'Registration Certificate (RC)', file_name: 'rc_van_05.pdf', file_url: '#', expiry_date: '2030-12-31', status: 'Active' },
+      { id: 2, entity_type: 'driver', entity_id: 1, document_type: 'Driving License', file_name: 'license_alex.pdf', file_url: '#', expiry_date: '2027-06-30', status: 'Active' }
+    ];
+    if (!dbData.nextIds) dbData.nextIds = {};
+    dbData.nextIds.documents = 3;
+    fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2));
+  }
+  return dbData;
 }
 
 // Helper to write database
@@ -209,9 +223,10 @@ const query = async (text, params = []) => {
         throw err;
       }
       deleted = data.vehicles.splice(index, 1)[0];
-      // Cascade delete: Maintenances and Fuel Logs
+      // Cascade delete: Maintenances, Fuel Logs and Documents
       data.maintenances = data.maintenances.filter(m => m.vehicle_id !== Number(id));
       data.fuel_logs = data.fuel_logs.filter(f => f.vehicle_id !== Number(id));
+      data.documents = data.documents.filter(doc => !(doc.entity_type === 'vehicle' && doc.entity_id === Number(id)));
       writeDB(data);
     }
     return { rows: deleted ? [deleted] : [] };
@@ -353,6 +368,8 @@ const query = async (text, params = []) => {
         throw err;
       }
       deleted = data.drivers.splice(index, 1)[0];
+      // Cascade delete: Documents
+      data.documents = data.documents.filter(doc => !(doc.entity_type === 'driver' && doc.entity_id === Number(id)));
       writeDB(data);
     }
     return { rows: deleted ? [deleted] : [] };
@@ -560,6 +577,45 @@ const query = async (text, params = []) => {
     });
     rows.sort((a, b) => b.id - a.id);
     return { rows };
+  }
+
+  // 27. Documents Query
+  if (sql.startsWith('SELECT * FROM documents WHERE entity_type = $1 AND entity_id = $2')) {
+    const [entityType, entityId] = params;
+    const rows = data.documents.filter(d => d.entity_type === entityType && d.entity_id === Number(entityId)).sort((a, b) => b.id - a.id);
+    return { rows };
+  }
+  if (sql.startsWith('SELECT * FROM documents WHERE id = $1')) {
+    const id = params[0];
+    const rows = data.documents.filter(d => d.id === Number(id));
+    return { rows };
+  }
+  if (sql.startsWith('INSERT INTO documents')) {
+    const id = data.nextIds.documents++;
+    const [entity_type, entity_id, document_type, file_name, file_url, expiry_date, status] = params;
+    const newDoc = {
+      id,
+      entity_type,
+      entity_id: Number(entity_id),
+      document_type,
+      file_name,
+      file_url: file_url || '#',
+      expiry_date: expiry_date || null,
+      status: status || 'Active'
+    };
+    data.documents.push(newDoc);
+    writeDB(data);
+    return { rows: [newDoc] };
+  }
+  if (sql.startsWith('DELETE FROM documents WHERE id = $1')) {
+    const id = params[0];
+    const index = data.documents.findIndex(d => d.id === Number(id));
+    let deleted = null;
+    if (index !== -1) {
+      deleted = data.documents.splice(index, 1)[0];
+      writeDB(data);
+    }
+    return { rows: deleted ? [deleted] : [] };
   }
 
   console.log('UNMATCHED SQL QUERY:', sql);
